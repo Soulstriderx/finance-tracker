@@ -1,5 +1,7 @@
 package com.fwrdgrp.financetracker.core.di
 
+import com.fwrdgrp.financetracker.data.repo.Repo
+import com.fwrdgrp.financetracker.data.repo.RepoImpl
 import com.fwrdgrp.financetracker.service.FirebaseAuthService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -24,5 +26,11 @@ class AppModule {
     @Singleton
     fun providesFirebaseAuthService(firebaseAuth: FirebaseAuth): FirebaseAuthService {
         return FirebaseAuthService(firebaseAuth)
+    }
+
+    @Provides
+    @Singleton
+    fun providesAuthRepo(authService: FirebaseAuthService, firestore: FirebaseFirestore): Repo {
+        return RepoImpl(authService, firestore)
     }
 }
