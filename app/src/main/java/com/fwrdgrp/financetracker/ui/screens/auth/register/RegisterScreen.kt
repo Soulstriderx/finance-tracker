@@ -35,9 +35,11 @@ import androidx.navigation.NavController
 import com.fwrdgrp.financetracker.data.model.main.MonthlyIncome
 import com.fwrdgrp.financetracker.data.model.request.RegisterReq
 import com.fwrdgrp.financetracker.data.model.ui.FieldData
-import com.fwrdgrp.financetracker.ui.composables.CustomTextField
-import com.fwrdgrp.financetracker.ui.composables.DatePicker
+import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
+import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
 import com.fwrdgrp.financetracker.ui.uiutils.getDayWithSuffix
+import com.fwrdgrp.financetracker.ui.uiutils.toCalendar
+import com.google.firebase.Timestamp
 import java.util.Calendar
 
 @Composable
@@ -99,6 +101,8 @@ fun Register(
     form: RegisterReq,
     onFormChange: (RegisterReq) -> Unit,
 ) {
+
+    val paydayCalendar = income.payday?.toCalendar()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -162,15 +166,16 @@ fun Register(
                     )
                     Spacer(Modifier.height(16.dp))
                     DatePicker(
-                        selectedDate = income.payday?.let {
+                        selectedDate = paydayCalendar?.let {
                             "${getDayWithSuffix(it.get(Calendar.DAY_OF_MONTH))} of every month"
                         } ?: "",
-                        existingCalendar = income.payday,
-                        onDateSelected = {
+                        existingCalendar = paydayCalendar,
+                        onDateSelected = { calendar ->
+                            val timestamp = Timestamp(calendar.time)
                             onIncomeChange(
                                 income.copy(
-                                    day = it.get(Calendar.DAY_OF_MONTH),
-                                    payday = it
+                                    day = calendar.get(Calendar.DAY_OF_MONTH),
+                                    payday = timestamp
                                 )
                             )
                         }

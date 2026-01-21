@@ -7,6 +7,7 @@ data class Transaction(
     val type: TransactionType = TransactionType.EXPENSE,
     val category: String = "",
     val amount: String = "",
+    val note: String,
     val timestamp: Timestamp? = null,
     val year: Int = 0,
     val month: Int = 0,

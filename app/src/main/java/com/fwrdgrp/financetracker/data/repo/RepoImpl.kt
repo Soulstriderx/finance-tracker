@@ -29,4 +29,11 @@ class RepoImpl @Inject constructor(
                 ?: throw IllegalStateException("User doesn't exist")
         }
     }
+
+    override suspend fun fetchUser(uid: String): User {
+        val snapshot = dbRef.document(uid).get().await()
+
+        return snapshot.toObject(User::class.java)
+            ?: throw java.lang.IllegalStateException("User doesn't exist")
+    }
 }

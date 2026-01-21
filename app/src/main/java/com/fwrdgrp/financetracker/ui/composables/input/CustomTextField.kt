@@ -1,4 +1,4 @@
-package com.fwrdgrp.financetracker.ui.composables
+package com.fwrdgrp.financetracker.ui.composables.input
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth

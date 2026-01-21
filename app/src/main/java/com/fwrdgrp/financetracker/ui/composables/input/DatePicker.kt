@@ -1,4 +1,4 @@
-package com.fwrdgrp.financetracker.ui.composables
+package com.fwrdgrp.financetracker.ui.composables.input
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog

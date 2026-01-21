@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,8 +30,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.fwrdgrp.financetracker.data.model.request.LoginReq
 import com.fwrdgrp.financetracker.data.model.ui.FieldData
-import com.fwrdgrp.financetracker.ui.composables.CustomTextField
+import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.navigation.Screen
+import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 fun LoginScreen(
@@ -38,6 +40,18 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     var form by remember { mutableStateOf(LoginReq()) }
+
+    LaunchedEffect(Unit) {
+        viewModel.finish.collect {
+            navController.navigate(Screen.Home)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.user.filterNotNull().collect {
+            navController.navigate(Screen.Home)
+        }
+    }
 
     Login(
         { viewModel.login(form) },
