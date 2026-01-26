@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +26,7 @@ import com.fwrdgrp.financetracker.ui.composables.scaffold.CustomTopBar
 import com.fwrdgrp.financetracker.ui.screens.auth.login.LoginScreen
 import com.fwrdgrp.financetracker.ui.screens.auth.register.RegisterScreen
 import com.fwrdgrp.financetracker.ui.screens.home.HomeScreen
+import com.fwrdgrp.financetracker.ui.screens.manage.add.AddTransactionScreen
 
 @Composable
 fun AppNav(
@@ -36,6 +38,7 @@ fun AppNav(
 
     val showBottomBar = when {
         curDest == null -> false
+        curDest.hasRoute<Screen.Add>() ||
         curDest.hasRoute<Screen.Login>() ||
         curDest.hasRoute<Screen.Register>() -> false
         else -> true
@@ -59,8 +62,9 @@ fun AppNav(
     val label = when {
         curDest == null -> ""
         curDest.hasRoute<Screen.Home>() -> "Home"
-//        curDest.hasRoute<Screen.Add>() -> "Add Expense"
-//        curDest.hasRoute<Screen.Update>() -> "Update Expense"
+        curDest.hasRoute<Screen.Add>() -> "Add Transaction"
+//        curDest.hasRoute<Screen.Edit>() -> "Edit Transaction"
+
 //        curDest.hasRoute<Screen.Profile>() -> "Profile"
         else -> ""
     }
@@ -71,14 +75,22 @@ fun AppNav(
         bottomBar = {
             if (showBottomBar) {
                 BottomNavBar(curDest)
-                { screen -> navController.navigate(screen) }
+                { screen ->
+                    navController.navigate(screen) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
             }
         },
         floatingActionButton = {
             if (showBottomBar) {
                 Box(modifier = Modifier.offset(y = 58.dp)) {
                     AddExpenseFab(
-                        onClick = { /*navController.navigate(Screen.Add)*/ }
+                        onClick = { navController.navigate(Screen.Add) }
                     )
                 }
             }
@@ -92,7 +104,6 @@ fun AppNav(
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 if (showTopBar) {
-                    HorizontalDivider(thickness = 1.dp)
                     CustomTopBar(
                         navController = navController,
                         label = label,
@@ -112,5 +123,9 @@ fun Nav(modifier: Modifier = Modifier, navController: NavHostController) {
         composable<Screen.Login> { LoginScreen(navController) }
         composable<Screen.Register> { RegisterScreen(navController) }
         composable<Screen.Home> { HomeScreen(navController) }
+        composable<Screen.Add> { AddTransactionScreen(navController) }
+//        composable<Screen.Edit> { EditTransactionScreen(navController) }
+
+
     }
 }
