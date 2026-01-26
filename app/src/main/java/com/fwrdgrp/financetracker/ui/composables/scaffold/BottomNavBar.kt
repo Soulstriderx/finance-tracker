@@ -28,14 +28,20 @@ fun BottomNavBar(
     ) {
         NavigationBarItem(
             selected = currentRoute?.hasRoute<Screen.Home>() == true,
-            onClick = { onNavigate(Screen.Home) },
+            onClick = {
+                if (currentRoute?.hasRoute<Screen.Home>() != true)
+                    onNavigate(Screen.Home)
+            },
             icon = { Icon(Icons.Outlined.Home, null) },
             label = { Text("Home") }
         )
 
         NavigationBarItem(
-            selected = currentRoute?.hasRoute<Screen.Home>() != true,
-            onClick = { onNavigate(Screen.Home) },
+            selected = currentRoute?.hasRoute<Screen.Transaction>() == true,
+            onClick = {
+                if (currentRoute?.hasRoute<Screen.Transaction>() != true)
+                    onNavigate(Screen.Transaction)
+            },
             icon = { Icon(Icons.Outlined.List, null) },
             label = { Text("Transactions") }
         )
@@ -44,13 +50,17 @@ fun BottomNavBar(
 
         NavigationBarItem(
             selected = currentRoute?.hasRoute<Screen.Home>() == true,
-            onClick = { onNavigate(Screen.Home) },
+            onClick = {
+                if (currentRoute?.hasRoute<Screen.Home>() != true)
+                    onNavigate(Screen.Home)
+            },
             icon = { Icon(Icons.Outlined.PieChart, null) },
             label = { Text("Stats") }
         )
 
         NavigationBarItem(
             selected = currentRoute?.hasRoute<Screen.Home>() == true,
+            enabled = currentRoute?.hasRoute<Screen.Home>() == true,
             onClick = { onNavigate(Screen.Home) },
             icon = { Icon(Icons.Outlined.Person, null) },
             label = { Text("Profile") }

@@ -82,3 +82,53 @@ fun Calendar.toFullTextDate(): String {
     }, ${this.get(Calendar.YEAR)}"
 }
 
+fun Calendar.toWeekRangeText(): String {
+    val endDate = this.clone() as Calendar
+    val startDate = this.clone() as Calendar
+    startDate.add(Calendar.DAY_OF_MONTH, -7)
+
+    val startDay = getDayWithSuffix(startDate.get(Calendar.DAY_OF_MONTH))
+    val startMonth = months[startDate.get(Calendar.MONTH)]
+    val endDay = getDayWithSuffix(endDate.get(Calendar.DAY_OF_MONTH))
+    val endMonth = months[endDate.get(Calendar.MONTH)]
+    val year = endDate.get(Calendar.YEAR)
+
+    return if (startDate.get(Calendar.MONTH) == endDate.get(Calendar.MONTH)) {
+        "$startDay to $endDay of $endMonth, $year"
+    } else {
+        val startYear = startDate.get(Calendar.YEAR)
+        if (startYear == year) {
+            "$startDay of $startMonth to $endDay of $endMonth, $year"
+        } else {
+            "$startDay of $startMonth, $startYear to $endDay of $endMonth, $year"
+        }
+    }
+}
+
+fun Calendar.toMonthRangeText(): String {
+    val endDate = this.clone() as Calendar
+    val startDate = this.clone() as Calendar
+    startDate.add(Calendar.DAY_OF_MONTH, -30)
+
+    val startDay = getDayWithSuffix(startDate.get(Calendar.DAY_OF_MONTH))
+    val startMonth = months[startDate.get(Calendar.MONTH)]
+    val endDay = getDayWithSuffix(endDate.get(Calendar.DAY_OF_MONTH))
+    val endMonth = months[endDate.get(Calendar.MONTH)]
+    val year = endDate.get(Calendar.YEAR)
+
+    return if (startDate.get(Calendar.MONTH) == endDate.get(Calendar.MONTH)) {
+        "$startDay to $endDay of $endMonth, $year"
+    } else {
+        val startYear = startDate.get(Calendar.YEAR)
+        if (startYear == year) {
+            "$startDay of $startMonth to $endDay of $endMonth, $year"
+        } else {
+            "$startDay of $startMonth, $startYear to $endDay of $endMonth, $year"
+        }
+    }
+}
+
+fun Calendar.toRegisterString(): String {
+    return "${getDayWithSuffix(this.get(Calendar.DAY_OF_MONTH))} of every month"
+}
+

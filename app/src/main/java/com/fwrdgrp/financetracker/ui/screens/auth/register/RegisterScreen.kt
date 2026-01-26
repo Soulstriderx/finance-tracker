@@ -34,11 +34,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.fwrdgrp.financetracker.data.model.main.MonthlyIncome
 import com.fwrdgrp.financetracker.data.model.request.RegisterReq
-import com.fwrdgrp.financetracker.data.model.ui.FieldData
 import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
-import com.fwrdgrp.financetracker.ui.uiutils.getDayWithSuffix
 import com.fwrdgrp.financetracker.ui.uiutils.toCalendar
+import com.fwrdgrp.financetracker.ui.uiutils.toRegisterString
 import com.google.firebase.Timestamp
 import java.util.Calendar
 
@@ -83,7 +82,7 @@ fun RegisterScreen(
         { viewModel.register(form, income, checked) },
         { navController.popBackStack() },
         checked,
-        {checked = !checked},
+        { checked = !checked },
         income,
         { income = it },
         form
@@ -125,28 +124,20 @@ fun Register(
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(24.dp))
-                CustomTextField(
-                    FieldData("Name", form.name)
-                    { onFormChange(form.copy(name = it)) })
+                CustomTextField("Name", form.name)
+                { onFormChange(form.copy(name = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField(
-                    FieldData("Email", form.email)
-                    { onFormChange(form.copy(email = it)) })
+                CustomTextField("Email", form.email)
+                { onFormChange(form.copy(email = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField(
-                    FieldData("Password", form.password, isPassword = true)
-                    { onFormChange(form.copy(password = it)) })
+                CustomTextField("Password", form.password, isPassword = true)
+                { onFormChange(form.copy(password = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField(
-                    FieldData("Confirm Password", form.password2, isPassword = true)
-                    { onFormChange(form.copy(password2 = it)) })
+                CustomTextField("Confirm Password", form.password2, isPassword = true)
+                { onFormChange(form.copy(password2 = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField(
-                    FieldData(
-                        "Balance",
-                        form.balance ?: ""
-                    )
-                    { onFormChange(form.copy(balance = it)) })
+                CustomTextField("Balance", form.balance ?: "")
+                { onFormChange(form.copy(balance = it)) }
                 Spacer(Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
@@ -157,18 +148,11 @@ fun Register(
                 }
                 Spacer(Modifier.height(10.dp))
                 if (checked) {
-                    CustomTextField(
-                        FieldData(
-                            "Monthly Income",
-                            income.amount
-                        )
-                        { onIncomeChange(income.copy(amount = it)) }
-                    )
+                    CustomTextField("Monthly Income", income.amount)
+                    { onIncomeChange(income.copy(amount = it)) }
                     Spacer(Modifier.height(16.dp))
                     DatePicker(
-                        selectedDate = paydayCalendar?.let {
-                            "${getDayWithSuffix(it.get(Calendar.DAY_OF_MONTH))} of every month"
-                        } ?: "",
+                        selectedDate = paydayCalendar?.toRegisterString() ?: "",
                         existingCalendar = paydayCalendar,
                         onDateSelected = { calendar ->
                             val timestamp = Timestamp(calendar.time)

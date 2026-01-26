@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.fwrdgrp.financetracker.data.model.request.LoginReq
-import com.fwrdgrp.financetracker.data.model.ui.FieldData
 import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.navigation.Screen
 import kotlinx.coroutines.flow.filterNotNull
@@ -43,13 +42,17 @@ fun LoginScreen(
 
     LaunchedEffect(Unit) {
         viewModel.finish.collect {
-            navController.navigate(Screen.Home)
+            navController.navigate(Screen.Home) {
+                popUpTo<Screen.Login> { inclusive = true }
+            }
         }
     }
 
     LaunchedEffect(Unit) {
         viewModel.user.filterNotNull().collect {
-            navController.navigate(Screen.Home)
+            navController.navigate(Screen.Home) {
+                popUpTo<Screen.Login> { inclusive = true }
+            }
         }
     }
 
@@ -88,13 +91,11 @@ fun Login(
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(24.dp))
-                CustomTextField(
-                    FieldData("Email", form.email)
-                    { onFormChange(form.copy(email = it)) })
+                CustomTextField("Email", form.email)
+                { onFormChange(form.copy(email = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField(
-                    FieldData("Password", form.password, isPassword = true)
-                    { onFormChange(form.copy(password = it)) })
+                CustomTextField("Password", form.password, isPassword = true)
+                    { onFormChange(form.copy(password = it)) }
                 Spacer(Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),

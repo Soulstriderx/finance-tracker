@@ -20,32 +20,34 @@ import com.fwrdgrp.financetracker.data.model.main.Transaction
 
 @Composable
 fun ExpenseCard(transaction: List<Transaction>) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(6.dp, RoundedCornerShape(8.dp))
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .padding(vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Recent Expenses",
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleLarge,
-        )
-        HorizontalDivider(thickness = 1.dp)
-
-        transaction.forEachIndexed { index, item ->
-            ExpenseRow(item)
-            if (index < transaction.size - 1) {
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = Color(0, 0, 0, 20)
+    if (transaction.isNotEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(6.dp, RoundedCornerShape(8.dp))
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(8.dp)
                 )
+                .padding(vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Recent Expenses",
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
+            )
+            HorizontalDivider(thickness = 1.dp)
+
+            transaction.forEachIndexed { index, item ->
+                ExpenseRow(item)
+                if (index < transaction.size - 1) {
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = Color(0, 0, 0, 20)
+                    )
+                }
             }
         }
     }
