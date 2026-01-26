@@ -49,10 +49,10 @@ fun BottomNavBar(
         Spacer(modifier = Modifier.weight(1f))
 
         NavigationBarItem(
-            selected = currentRoute?.hasRoute<Screen.Home>() == true,
+            selected = currentRoute?.hasRoute<Screen.Stats>() == true,
             onClick = {
-                if (currentRoute?.hasRoute<Screen.Home>() != true)
-                    onNavigate(Screen.Home)
+                if (currentRoute?.hasRoute<Screen.Stats>() != true)
+                    onNavigate(Screen.Stats)
             },
             icon = { Icon(Icons.Outlined.PieChart, null) },
             label = { Text("Stats") }
