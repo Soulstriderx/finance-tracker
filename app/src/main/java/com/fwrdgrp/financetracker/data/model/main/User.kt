@@ -5,5 +5,5 @@ data class User(
     val name: String = "",
     val email: String = "",
     val monthlyIncome: MonthlyIncome = MonthlyIncome(),
-    val balance: String? = null
+    val balance: String = ""
 )

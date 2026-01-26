@@ -1,19 +1,24 @@
 package com.fwrdgrp.financetracker.service
 
-import com.fwrdgrp.financetracker.data.model.main.LocalFirebaseUser
+import com.fwrdgrp.financetracker.data.model.main.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class FirebaseAuthService @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
 ) {
-    private val _user = MutableStateFlow<LocalFirebaseUser?>(null)
+    private val _user = MutableStateFlow<User?>(null)
     val user = _user.asStateFlow()
 
     init {
@@ -34,33 +39,34 @@ class FirebaseAuthService @Inject constructor(
     }
 
     suspend fun login(email: String, password: String): FirebaseUser {
-        val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-        result.user?.let { updateUser(it) }
+            val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            val firebaseUser = result.user ?: throw IllegalStateException("User doesn't exist")
 
-        return result.user ?: throw java.lang.IllegalStateException("Login failed")
+            fetchFromFirestore(firebaseUser.uid)
+
+            return result.user ?: throw IllegalStateException("User doesn't exist")
     }
 
-    private fun updateUser(firebaseUser: FirebaseUser) {
-        firebaseUser.let { user ->
-            _user.update {
-                LocalFirebaseUser(
-                    uid = user.uid,
-                )
+    fun getCurrentUser(): User? {
+        return user.value
+    }
+
+    fun fetchFromFirestore(uid: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val userSnapshot = firestore.collection("users").document(uid).get().await()
+
+            userSnapshot.toObject(User::class.java).let { user ->
+                _user.update { user }
             }
         }
     }
 
-    fun getCurrentUser(): LocalFirebaseUser? {
-        return user.value
-    }
-
     private fun fetchLoggedInUser() {
-        _user.value = firebaseAuth.currentUser?.let {
-            LocalFirebaseUser(it.uid)
-        }
+        val firebaseUser = firebaseAuth.currentUser ?: return
+        fetchFromFirestore(firebaseUser.uid)
     }
 
-    suspend fun signout() {
+    fun signout() {
         firebaseAuth.signOut()
     }
 }
