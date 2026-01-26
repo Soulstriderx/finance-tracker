@@ -42,7 +42,7 @@ fun AppNav(
     val showBottomBar = when {
         curDest == null -> false
         curDest.hasRoute<Screen.Add>() ||
-//        curDest.hasRoute<Screen.Edit>() ||
+        curDest.hasRoute<Screen.Edit>() ||
         curDest.hasRoute<Screen.Login>() ||
         curDest.hasRoute<Screen.Register>() -> false
         else -> true
@@ -60,7 +60,8 @@ fun AppNav(
         curDest.hasRoute<Screen.Login>() ||
         curDest.hasRoute<Screen.Register>() ||
         curDest.hasRoute<Screen.Home>() ||
-        curDest.hasRoute<Screen.Transaction>() -> false
+        curDest.hasRoute<Screen.Transaction>() ||
+        curDest.hasRoute<Screen.Stats>() -> false
         else -> true
     }
 
@@ -68,8 +69,9 @@ fun AppNav(
         curDest == null -> ""
         curDest.hasRoute<Screen.Home>() -> "Home"
         curDest.hasRoute<Screen.Add>() -> "Add Transaction"
-//        curDest.hasRoute<Screen.Edit>() -> "Edit Transaction"
+        curDest.hasRoute<Screen.Edit>() -> "Edit Transaction"
         curDest.hasRoute<Screen.Transaction>() -> "Transactions"
+        curDest.hasRoute<Screen.Stats>() -> "Stats"
 //        curDest.hasRoute<Screen.Profile>() -> "Profile"
         else -> ""
     }
@@ -129,8 +131,9 @@ fun Nav(modifier: Modifier = Modifier, navController: NavHostController) {
         composable<Screen.Register> { RegisterScreen(navController) }
         composable<Screen.Home> { HomeScreen(navController) }
         composable<Screen.Add> { AddTransactionScreen(navController) }
-//        composable<Screen.Edit> { EditTransactionScreen(navController) }
+        composable<Screen.Edit> { EditTransactionScreen(navController) }
         composable<Screen.Transaction> { TransactionScreen(navController) }
+        composable<Screen.Stats> { StatsScreen(navController) }
 
     }
 }
