@@ -7,6 +7,16 @@ data class MonthlyIncome(
     val day: Int? = null,
     val payday: Timestamp? = null
 ) {
+    companion object {
+        fun fromMap(map: Map<String, Any>): MonthlyIncome {
+            return MonthlyIncome(
+                amount = map["amount"] as? String ?: "",
+                day = (map["day"] as? Int) ?: 0,
+                payday = map["payday"] as? Timestamp
+            )
+        }
+    }
+
     fun toMap(): Map<String, Any> {
         return mutableMapOf<String, Any>(
             "amount" to amount,
