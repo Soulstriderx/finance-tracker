@@ -38,7 +38,6 @@ import com.fwrdgrp.financetracker.ui.composables.general.TabButtons
 import com.fwrdgrp.financetracker.ui.composables.input.CustomDropdown
 import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
-import com.fwrdgrp.financetracker.ui.uiutils.createFormWithToday
 import com.fwrdgrp.financetracker.ui.uiutils.toCalendar
 import com.fwrdgrp.financetracker.ui.uiutils.toFullTextDate
 import com.google.firebase.Timestamp
@@ -98,9 +97,9 @@ fun ManageExpense(
             ) {
                 TabButtons(
                     typeTabs,
-                    form.type,
+                    if (isEditing) form.newType else form.type,
                     label = { it.toString() }
-                ) { form = form.copy(type = it) }
+                ) { form = if (isEditing) form.copy(newType = it) else form.copy(type = it) }
             }
             Spacer(Modifier.height(16.dp))
             Text(
@@ -108,8 +107,8 @@ fun ManageExpense(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium
             )
-            CustomTextField("Amount", form.amount)
-            { form = form.copy(amount = it) }
+            CustomTextField("Amount", if (isEditing) form.newAmount else form.amount)
+            { form = if (isEditing) form.copy(newAmount = it) else form.copy(amount = it) }
 
             Spacer(Modifier.height(16.dp))
             Text(

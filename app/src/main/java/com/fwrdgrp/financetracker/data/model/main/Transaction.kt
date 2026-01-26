@@ -6,6 +6,7 @@ import com.fwrdgrp.financetracker.data.enum.TransactionType
 import com.google.firebase.Timestamp
 
 data class Transaction(
+    val uid: String = "",
     val type: TransactionType = TransactionType.Expense,
     val method: PaymentMethod = PaymentMethod.Cash,
     val category: Category = Category.Food,

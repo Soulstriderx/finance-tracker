@@ -29,7 +29,5 @@ fun AddTransactionScreen(
         showDialog,
         { showDialog = it },
         onCancel = { navController.popBackStack() },
-    ) { viewModel.addTransaction(it)
-
-    }
+    ) { viewModel.addTransaction(it) }
 }

@@ -184,7 +184,8 @@ fun aggregateDailyTransactions(
     transactions.forEach { transaction ->
         transaction.timestamp?.toDate()?.let { date ->
             val transCalendar = Calendar.getInstance().apply { time = date }
-            val daysDiff = ((referenceCalendar.timeInMillis - transCalendar.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
+            val daysDiff =
+                ((referenceCalendar.timeInMillis - transCalendar.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
 
             if (daysDiff in 0..6) {
                 val dateFormat = SimpleDateFormat("EEE", Locale.getDefault())
@@ -298,11 +299,39 @@ fun generateTrendDescription(data: List<BarData>, filter: DateFilter): String {
 
     return when (trend) {
         "increasing" -> "Spending is trending up by ${changePercent}% this $period. Highest: ${
-            highestDay?.name} ($${highestDay?.spend?.toDouble()?.withCommas()})."
+            highestDay?.name
+        } ($${highestDay?.spend?.toDouble()?.withCommas()})."
+
         "decreasing" -> "Spending is trending down by ${
-            -changePercent}% this $period. You're saving more lately!"
+            -changePercent
+        }% this $period. You're saving more lately!"
+
         else -> "Spending is relatively stable this $period at $${
-            average.toDouble().withCommas()} average per ${filter.name.lowercase()}."
+            average.toDouble().withCommas()
+        } average per ${filter.name.lowercase()}."
     }
+}
+
+fun createFormWithTransaction(transaction: Transaction): TransactionReq {
+    val calendar = Calendar.getInstance()
+    val timestamp = transaction.timestamp ?: Timestamp(calendar.time)
+
+    val derivedDate = deriveDateFields(timestamp.toDate().time)
+
+    return TransactionReq(
+        uid = transaction.uid,
+        newType = transaction.type,
+        type = transaction.type,
+        method = transaction.method,
+        category = transaction.category,
+        amount = transaction.amount,
+        newAmount = transaction.amount,
+        note = transaction.note,
+        timestamp = timestamp,
+        year = derivedDate.year,
+        month = derivedDate.month,
+        day = derivedDate.day,
+        week = derivedDate.week
+    )
 }
 

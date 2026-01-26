@@ -25,7 +25,9 @@ import com.fwrdgrp.financetracker.data.model.ui.PieChartData
 import com.fwrdgrp.financetracker.ui.composables.home.BalanceCard
 import com.fwrdgrp.financetracker.ui.composables.home.BreakdownCard
 import com.fwrdgrp.financetracker.ui.composables.home.ExpenseCard
+import com.fwrdgrp.financetracker.ui.navigation.Screen
 import com.fwrdgrp.financetracker.ui.uiutils.toPieChartData
+import java.util.Calendar
 
 @Composable
 fun HomeScreen(
@@ -33,23 +35,33 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
+    val recentTransaction by viewModel.recentTransactions.collectAsStateWithLifecycle()
     val transactions by viewModel.transactions.collectAsStateWithLifecycle()
-
+    val selectedTab by viewModel.dateFilter.collectAsStateWithLifecycle()
+    var calendar by remember { mutableStateOf(Calendar.getInstance()) }
 
     user?.let { user ->
-        Home(user, transactions, transactions.toPieChartData())
+        Home(
+            user,
+            selectedTab,
+            recentTransaction,
+            transactions.toPieChartData(),
+            { navController.navigate(Screen.Edit(it)) }
+        )
+        { viewModel.onDateFilterSelect(it, calendar) }
     }
 }
 
 @Composable
 fun Home(
     user: User,
-    transactions: List<Transaction>,
-    pieChartData: List<PieChartData>
+    selectedTab: DateFilter,
+    recentTransactions: List<Transaction>,
+    pieChartData: List<PieChartData>,
+    navToDetails: (String) -> Unit,
+    onSelect: (DateFilter) -> Unit,
 ) {
     val tabs = DateFilter.entries
-    var selectedTab by remember { mutableStateOf(tabs.first()) }
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -60,8 +72,8 @@ fun Home(
         ) {
             item { Spacer(Modifier.height(8.dp)) }
             item { BalanceCard(user.balance) }
-            item { BreakdownCard(tabs, pieChartData, selectedTab) { selectedTab = it } }
-            item { ExpenseCard(transactions) }
+            item { BreakdownCard(tabs, pieChartData, selectedTab) { onSelect(it) } }
+            item { ExpenseCard(recentTransactions, { navToDetails(it) }) }
             item { Spacer(Modifier.height(100.dp)) }
         }
     }

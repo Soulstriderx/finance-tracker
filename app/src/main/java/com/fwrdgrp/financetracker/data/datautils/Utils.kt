@@ -1,6 +1,7 @@
 package com.fwrdgrp.financetracker.data.datautils
 
 import com.fwrdgrp.financetracker.data.enum.DateFilter
+import com.fwrdgrp.financetracker.data.enum.TransactionType
 import com.fwrdgrp.financetracker.data.model.main.DerivedDate
 import java.util.Calendar
 
@@ -47,5 +48,21 @@ fun calculateStatsDateRange(
     }
 
     return start.timeInMillis to end
+}
+
+fun getNewBalance(old: Double, new: Double, oldType: TransactionType, newType: TransactionType): Double {
+    val reverse =
+        if (oldType == TransactionType.Expense) {
+            old
+        } else {
+            -old
+        }
+
+    val newAmount = if (newType == TransactionType.Expense) {
+        -new
+    } else {
+        new
+    }
+    return reverse + newAmount
 }
 
