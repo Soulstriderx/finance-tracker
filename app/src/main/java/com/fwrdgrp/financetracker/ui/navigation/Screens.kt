@@ -12,4 +12,6 @@ sealed class Screen {
     object Home: Screen()
     @Serializable
     object Add: Screen()
+    @Serializable
+    object Transaction: Screen()
 }

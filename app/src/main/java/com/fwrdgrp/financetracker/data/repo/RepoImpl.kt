@@ -86,4 +86,49 @@ class RepoImpl @Inject constructor(
 
         awaitClose { snapshot.remove() }
     }
+
+    override suspend fun fetchTransactionById(uid: String): Transaction {
+        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
+        val snapshot = dbRef
+            .document(user.uid)
+            .collection("transactions")
+            .document(uid).get().await()
+
+        return snapshot.toObject(Transaction::class.java)
+            ?: throw IllegalStateException("Transaction doesn't exist")
+    }
+
+    override suspend fun fetchTransactionsByDate(
+        filter: DateFilter,
+        referenceDate: Calendar,
+        isStats: Boolean
+    ): Flow<List<Transaction>> = callbackFlow {
+        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
+
+        val (startMillis, endMillis) = if (isStats) {
+            calculateStatsDateRange(filter, referenceDate)
+        } else {
+            calculateDateRange(filter, referenceDate)
+        }
+        val startTimestamp = Timestamp(Date(startMillis))
+        val endTimestamp = Timestamp(Date(endMillis))
+
+        val snapshot = dbRef
+            .document(user.uid)
+            .collection("transactions")
+            .whereGreaterThanOrEqualTo("timestamp", startTimestamp)
+            .whereLessThan("timestamp", endTimestamp)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val transactions = snapshot?.documents?.mapNotNull {
+                    it.toObject(Transaction::class.java)
+                } ?: emptyList()
+                trySend(transactions)
+            }
+        awaitClose { snapshot.remove() }
+    }
 }
