@@ -10,4 +10,6 @@ sealed class Screen {
     object Register: Screen()
     @Serializable
     object Home: Screen()
+    @Serializable
+    object Add: Screen()
 }

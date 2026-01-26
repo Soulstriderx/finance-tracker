@@ -1,4 +1,4 @@
-package com.fwrdgrp.financetracker.ui.composables.home
+package com.fwrdgrp.financetracker.ui.composables.charts
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*

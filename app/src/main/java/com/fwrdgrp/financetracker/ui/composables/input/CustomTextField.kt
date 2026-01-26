@@ -18,24 +18,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.fwrdgrp.financetracker.data.model.ui.FieldData
 
 @Composable
 fun CustomTextField(
-    field: FieldData
+    label: String,
+    value: String,
+    isPassword: Boolean = false,
+    onValueChange: (String) -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
 
     OutlinedTextField(
-        value = field.value,
-        onValueChange = field.onValueChange,
-        shape = RoundedCornerShape(8.dp),
-        visualTransformation = if(field.isPassword) {
+        value = value,
+        onValueChange = { onValueChange(it) },
+        shape = RoundedCornerShape(12.dp),
+        visualTransformation = if(isPassword) {
             if (!visible) PasswordVisualTransformation()
             else VisualTransformation.None
         } else VisualTransformation.None,
         trailingIcon = {
-            if (field.isPassword) {
+            if (isPassword) {
                 Icon(
                     imageVector = if (visible) Icons.Filled.Visibility
                     else Icons.Filled.VisibilityOff,
@@ -46,7 +48,7 @@ fun CustomTextField(
                 )
             }
         },
-        label = { Text(field.label) },
+        placeholder = { Text(label) },
         singleLine = true,
         modifier = Modifier.fillMaxWidth()
     )
