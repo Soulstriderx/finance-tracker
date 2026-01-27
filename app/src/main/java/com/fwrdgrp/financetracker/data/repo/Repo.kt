@@ -21,6 +21,7 @@ interface Repo {
     //TransactionRepo
     suspend fun addTransaction(transaction: TransactionReq)
     suspend fun editTransaction(transaction: TransactionReq)
+    suspend fun deleteTransaction(uid: String)
     suspend fun fetchMyTransactions(): Flow<List<Transaction>>
     suspend fun fetchTransactionById(uid: String): Transaction
 

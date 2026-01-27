@@ -46,7 +46,7 @@ fun HomeScreen(
             selectedTab,
             recentTransaction,
             transactions.toPieChartData(),
-            { navController.navigate(Screen.Edit(it)) }
+            { navController.navigate(Screen.TranDetails(it)) }
         )
         { viewModel.onDateFilterSelect(it, calendar) }
     }
