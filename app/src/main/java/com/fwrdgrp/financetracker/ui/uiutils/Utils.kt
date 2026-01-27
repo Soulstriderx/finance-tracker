@@ -2,6 +2,7 @@ package com.fwrdgrp.financetracker.ui.uiutils
 
 import com.fwrdgrp.financetracker.data.datautils.deriveDateFields
 import com.fwrdgrp.financetracker.data.enum.BarData
+import com.fwrdgrp.financetracker.data.enum.Category
 import com.fwrdgrp.financetracker.data.enum.DateFilter
 import com.fwrdgrp.financetracker.data.enum.TransactionType
 import com.fwrdgrp.financetracker.data.model.main.Transaction
@@ -263,6 +264,7 @@ fun calculateChartData(
     return BarChartData(data, maxValue, average)
 }
 
+//Function too long. Shorten it
 fun generateTrendDescription(data: List<BarData>, filter: DateFilter): String {
     if (data.isEmpty() || data.all { it.spend == 0f }) {
         return "No spending data available for this period."
@@ -333,5 +335,10 @@ fun createFormWithTransaction(transaction: Transaction): TransactionReq {
         day = derivedDate.day,
         week = derivedDate.week
     )
+}
+
+fun Transaction.displayCategory(): String {
+    return if (category == Category.Other && !customCategory.isNullOrBlank()) customCategory
+    else category.name
 }
 

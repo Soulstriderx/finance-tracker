@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -24,6 +25,38 @@ class EditTransactionViewModel @Inject constructor(
 
     init {
         fetchTransactionById(uid)
+        fetchCustomCategories()
+
+    }
+
+    fun fetchCustomCategories() {
+        viewModelScope.launch {
+            safeApiCall {
+                repo.fetchCustomCategories().let { customCategory ->
+                    _customCategories.update { customCategory }
+                }
+            }
+        }
+    }
+
+    fun addCustomCategory(category: String) {
+        viewModelScope.launch {
+            safeApiCall {
+                repo.addCustomCategory(category).let {
+                    fetchCustomCategories()
+                }
+            }
+        }
+    }
+
+    fun deleteCustomCategory(category: String) {
+        viewModelScope.launch {
+            safeApiCall {
+                repo.deleteCustomCategory(category).let {
+                    fetchCustomCategories()
+                }
+            }
+        }
     }
 
     fun fetchTransactionById(uid: String) {

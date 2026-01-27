@@ -10,6 +10,7 @@ data class Transaction(
     val type: TransactionType = TransactionType.Expense,
     val method: PaymentMethod = PaymentMethod.Cash,
     val category: Category = Category.Food,
+    val customCategory: String? = null,
     val amount: String = "",
     val note: String = "",
     val timestamp: Timestamp? = null,

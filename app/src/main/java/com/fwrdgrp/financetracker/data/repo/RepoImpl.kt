@@ -12,8 +12,11 @@ import com.fwrdgrp.financetracker.data.model.request.RegisterReq
 import com.fwrdgrp.financetracker.data.model.request.TransactionReq
 import com.fwrdgrp.financetracker.service.FirebaseAuthService
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +30,14 @@ class RepoImpl @Inject constructor(
     firestore: FirebaseFirestore
 ) : Repo {
     private val dbRef = firestore.collection("users")
+
+    private fun requireUser(): User {
+        return authService.getCurrentUser() ?: throw IllegalStateException("User not logged in")
+    }
+
+    private fun userDoc(): DocumentReference {
+        return dbRef.document(requireUser().uid)
+    }
 
     override suspend fun register(user: RegisterReq) {
         val userUid = authService.register(user.email, user.password)
@@ -52,14 +63,13 @@ class RepoImpl @Inject constructor(
     }
 
     override suspend fun addTransaction(transaction: TransactionReq) {
-        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
+        val user = requireUser()
         val newBalance = if (transaction.type == TransactionType.Expense) {
             (user.balance.toDouble() - transaction.amount.toDouble()).toString()
         } else {
             (user.balance.toDouble() + transaction.amount.toDouble()).toString()
         }
-        val userDoc = dbRef.document(user.uid)
-        val transactionRef = userDoc
+        val transactionRef = userDoc()
             .collection("transactions")
             .document()
 
@@ -67,17 +77,16 @@ class RepoImpl @Inject constructor(
             uid = transactionRef.id
         )
 
-        userDoc.update("balance", newBalance)
+        userDoc().update("balance", newBalance)
         transactionRef.set(transactionWithId.toMap()).await()
     }
 
     override suspend fun editTransaction(transaction: TransactionReq) {
-        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
+        val user = requireUser()
 
         val oldAmount = transaction.amount.toDouble()
         val newAmount = transaction.newAmount.toDouble()
 
-        val userDoc = dbRef.document(user.uid)
         val updatedAmount = getNewBalance(
             oldAmount,
             newAmount,
@@ -86,27 +95,57 @@ class RepoImpl @Inject constructor(
         )
         val newBalance = user.balance.toDouble() + updatedAmount
 
-
-
-        userDoc.update("balance", newBalance.toString())
-        userDoc.collection("transactions").document(transaction.uid)
+        userDoc().update("balance", newBalance.toString())
+        userDoc().collection("transactions").document(transaction.uid)
             .update(transaction.toEditMap())
     }
 
-    override suspend fun deleteTransaction(uid: String) {
-        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
-        val transactionRef = dbRef
-            .document(user.uid)
-            .collection("transactions")
+    override suspend fun deleteTransaction(uid: String, transaction: Transaction) {
+        val user = requireUser()
+        val transactionRef = userDoc().collection("transactions")
+        if (transaction.type == TransactionType.Expense) {
+            val balance = (user.balance.toDouble() + transaction.amount.toDouble()).toString()
+            userDoc().update("balance", balance).await()
+        } else {
+            val balance = (user.balance.toDouble() - transaction.amount.toDouble()).toString()
+            userDoc().update("balance", balance).await()
+        }
 
         transactionRef.document(uid).delete().await()
     }
 
+    override suspend fun fetchCustomCategories(): List<String> {
+        val categoriesDoc = userDoc().collection("custom_category").document("categories")
+        val snapshot = categoriesDoc.get().await()
+        return snapshot.get("categories") as? List<String> ?: emptyList()
+    }
+
+    override suspend fun addCustomCategory(customCat: String) {
+        val categoriesDoc = userDoc().collection("custom_category").document("categories")
+        categoriesDoc.set(
+            mapOf("categories" to FieldValue.arrayUnion(customCat)),
+            SetOptions.merge()
+        ).await()
+    }
+
+    override suspend fun deleteCustomCategory(customCat: String) {
+        val categoriesDoc = userDoc().collection("custom_category").document("categories")
+
+        categoriesDoc.update(
+            "categories",
+            FieldValue.arrayRemove(customCat)
+        ).await()
+
+        val query = userDoc().collection("transactions")
+            .whereEqualTo("customCategory", customCat)
+
+        query.get().await().forEach { doc ->
+            doc.reference.update("customCategory", null)
+        }
+    }
 
     override suspend fun fetchMyTransactions(): Flow<List<Transaction>> = callbackFlow {
-        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
-        val snapshot = dbRef
-            .document(user.uid)
+        val snapshot = userDoc()
             .collection("transactions")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
@@ -126,9 +165,7 @@ class RepoImpl @Inject constructor(
     }
 
     override suspend fun fetchTransactionById(uid: String): Transaction {
-        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
-        val snapshot = dbRef
-            .document(user.uid)
+        val snapshot = userDoc()
             .collection("transactions")
             .document(uid).get().await()
 
@@ -141,8 +178,6 @@ class RepoImpl @Inject constructor(
         referenceDate: Calendar,
         isStats: Boolean
     ): Flow<List<Transaction>> = callbackFlow {
-        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
-
         val (startMillis, endMillis) = if (isStats) {
             calculateStatsDateRange(filter, referenceDate)
         } else {
@@ -151,8 +186,7 @@ class RepoImpl @Inject constructor(
         val startTimestamp = Timestamp(Date(startMillis))
         val endTimestamp = Timestamp(Date(endMillis))
 
-        val snapshot = dbRef
-            .document(user.uid)
+        val snapshot = userDoc()
             .collection("transactions")
             .whereGreaterThanOrEqualTo("timestamp", startTimestamp)
             .whereLessThan("timestamp", endTimestamp)

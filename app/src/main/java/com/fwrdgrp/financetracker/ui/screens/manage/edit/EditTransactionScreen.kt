@@ -28,14 +28,21 @@ fun EditTransactionScreen(
 
     val transaction by viewModel.transaction.collectAsStateWithLifecycle()
 
+    val customCategories by viewModel.customCategories.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(false) }
+    var showCustomDialog by remember { mutableStateOf(false) }
 
     transaction?.let { transaction ->
         ManageExpense(
             createFormWithTransaction(transaction),
             showDialog,
             { showDialog = it },
+            showCustomDialog,
+            {showCustomDialog = it},
+            {viewModel.addCustomCategory(it)},
+            {viewModel.deleteCustomCategory(it)},
             true,
+            customCategories = customCategories,
             onCancel = { navController.popBackStack() },
         ) { viewModel.updateTransaction(it) }
     }

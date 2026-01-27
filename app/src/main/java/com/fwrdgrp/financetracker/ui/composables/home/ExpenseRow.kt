@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fwrdgrp.financetracker.data.model.main.Transaction
+import com.fwrdgrp.financetracker.ui.uiutils.displayCategory
 import com.fwrdgrp.financetracker.ui.uiutils.withCommas
 
 @Composable
@@ -56,7 +57,7 @@ fun ExpenseRow(item: Transaction, navToDetails: (String) -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        item.category.name,
+                        item.displayCategory(),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(

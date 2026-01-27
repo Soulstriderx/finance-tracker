@@ -39,10 +39,10 @@ class TransactionDetailsViewModel @Inject constructor(
         }
     }
 
-    fun deleteTransaction() {
+    fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
             safeApiCall {
-                repo.deleteTransaction(uid).let {
+                repo.deleteTransaction(uid, transaction).let {
                     _finish.emit(Unit)
                 }
             }
