@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,8 +25,11 @@ import com.fwrdgrp.financetracker.data.model.main.User
 import com.fwrdgrp.financetracker.data.model.ui.PieChartData
 import com.fwrdgrp.financetracker.ui.composables.home.BalanceCard
 import com.fwrdgrp.financetracker.ui.composables.home.BreakdownCard
+import com.fwrdgrp.financetracker.ui.composables.home.BudgetCard
 import com.fwrdgrp.financetracker.ui.composables.home.ExpenseCard
 import com.fwrdgrp.financetracker.ui.navigation.Screen
+import com.fwrdgrp.financetracker.ui.uiutils.calculateNextRefreshTimestamp
+import com.fwrdgrp.financetracker.ui.uiutils.shouldRollover
 import com.fwrdgrp.financetracker.ui.uiutils.toPieChartData
 import java.util.Calendar
 
@@ -40,7 +44,17 @@ fun HomeScreen(
     val selectedTab by viewModel.dateFilter.collectAsStateWithLifecycle()
     var calendar by remember { mutableStateOf(Calendar.getInstance()) }
 
+
+
     user?.let { user ->
+        LaunchedEffect(Unit) {
+            user.budget.let {
+                if (shouldRollover(it)) {
+                    val newTimestamp = calculateNextRefreshTimestamp(it.day ?: 0)
+                    viewModel.budgetRollover(newTimestamp)
+                }
+            }
+        }
         Home(
             user,
             selectedTab,
@@ -62,6 +76,7 @@ fun Home(
     onSelect: (DateFilter) -> Unit,
 ) {
     val tabs = DateFilter.entries
+    var showBudget by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -72,6 +87,9 @@ fun Home(
         ) {
             item { Spacer(Modifier.height(8.dp)) }
             item { BalanceCard(user.balance) }
+            if (user.budget.refresh != null) {
+                item { BudgetCard(user.budget, showBudget, { showBudget = it }) }
+            }
             item { BreakdownCard(tabs, pieChartData, selectedTab) { onSelect(it) } }
             item { ExpenseCard(recentTransactions, { navToDetails(it) }) }
             item { Spacer(Modifier.height(100.dp)) }

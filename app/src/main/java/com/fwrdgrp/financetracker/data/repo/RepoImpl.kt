@@ -266,4 +266,16 @@ class RepoImpl @Inject constructor(
             }
         awaitClose { snapshot.remove() }
     }
+
+    override suspend fun budgetRollover(newTimestamp: Timestamp) {
+        userDoc().update(
+            mapOf(
+                "budget.foodUsed" to "0",
+                "budget.transportationUsed" to "0",
+                "budget.entertainmentUsed" to "0",
+                "budget.householdUsed" to "0",
+                "budget.refresh" to newTimestamp
+            )
+        ).await()
+    }
 }
