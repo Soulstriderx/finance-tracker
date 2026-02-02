@@ -2,8 +2,8 @@ package com.fwrdgrp.financetracker.ui.composables.scaffold
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material3.Icon
@@ -42,7 +42,7 @@ fun BottomNavBar(
                 if (currentRoute?.hasRoute<Screen.Transaction>() != true)
                     onNavigate(Screen.Transaction)
             },
-            icon = { Icon(Icons.Outlined.List, null) },
+            icon = { Icon(Icons.AutoMirrored.Outlined.List, null) },
             label = { Text("Transactions") }
         )
 
@@ -59,9 +59,11 @@ fun BottomNavBar(
         )
 
         NavigationBarItem(
-            selected = currentRoute?.hasRoute<Screen.Home>() == true,
-            enabled = currentRoute?.hasRoute<Screen.Home>() == true,
-            onClick = { onNavigate(Screen.Home) },
+            selected = currentRoute?.hasRoute<Screen.Profile>() == true,
+            onClick = {
+                if (currentRoute?.hasRoute<Screen.Profile>() != true)
+                    onNavigate(Screen.Profile)
+            },
             icon = { Icon(Icons.Outlined.Person, null) },
             label = { Text("Profile") }
         )

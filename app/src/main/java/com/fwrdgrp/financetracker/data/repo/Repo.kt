@@ -5,6 +5,7 @@ import com.fwrdgrp.financetracker.data.enum.DateFilter
 import com.fwrdgrp.financetracker.data.model.main.Transaction
 import com.fwrdgrp.financetracker.data.model.main.User
 import com.fwrdgrp.financetracker.data.model.request.LoginReq
+import com.fwrdgrp.financetracker.data.model.request.ProfileUpdateReq
 import com.fwrdgrp.financetracker.data.model.request.RegisterReq
 import com.fwrdgrp.financetracker.data.model.request.TransactionReq
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,7 @@ interface Repo {
 
     //UserRepo
     suspend fun fetchUser(uid: String): User
+    suspend fun updateUser(update: ProfileUpdateReq)
 
     //TransactionRepo
     suspend fun addTransaction(transaction: TransactionReq)

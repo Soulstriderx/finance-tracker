@@ -5,7 +5,12 @@ import com.fwrdgrp.financetracker.data.enum.BarData
 import com.fwrdgrp.financetracker.data.enum.Category
 import com.fwrdgrp.financetracker.data.enum.DateFilter
 import com.fwrdgrp.financetracker.data.enum.TransactionType
+import com.fwrdgrp.financetracker.data.model.main.Budget
+import com.fwrdgrp.financetracker.data.model.main.MonthlyIncome
 import com.fwrdgrp.financetracker.data.model.main.Transaction
+import com.fwrdgrp.financetracker.data.model.main.User
+import com.fwrdgrp.financetracker.data.model.request.BudgetReq
+import com.fwrdgrp.financetracker.data.model.request.ProfileUpdateReq
 import com.fwrdgrp.financetracker.data.model.request.TransactionReq
 import com.fwrdgrp.financetracker.data.model.ui.BarChartData
 import com.fwrdgrp.financetracker.data.model.ui.PieChartData
@@ -14,6 +19,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 
 fun getDayWithSuffix(day: Int): String {
@@ -326,10 +332,12 @@ fun createFormWithTransaction(transaction: Transaction): TransactionReq {
         type = transaction.type,
         method = transaction.method,
         category = transaction.category,
+        newCategory = transaction.category,
         amount = transaction.amount,
         newAmount = transaction.amount,
         note = transaction.note,
         timestamp = timestamp,
+        newTimestamp = timestamp,
         year = derivedDate.year,
         month = derivedDate.month,
         day = derivedDate.day,
@@ -341,4 +349,62 @@ fun Transaction.displayCategory(): String {
     return if (category == Category.Other && !customCategory.isNullOrBlank()) customCategory
     else category.name
 }
+
+fun calculateAverages(
+    transactions: List<Transaction>,
+    referenceCalendar: Calendar = Calendar.getInstance()
+): Triple<Float, Float, Float> {
+    val dailyData = aggregateDailyTransactions(transactions, referenceCalendar)
+    val dailyAverage = if (dailyData.isNotEmpty()) {
+        dailyData.map { it.spend }.sum() / dailyData.size
+    } else 0f
+
+    val weeklyData = aggregateWeeklyTransactions(transactions, referenceCalendar)
+    val weeklyAverage = if (weeklyData.isNotEmpty()) {
+        weeklyData.map { it.spend }.sum() / weeklyData.size
+    } else 0f
+
+    val monthlyData = aggregateMonthlyTransactions(transactions, referenceCalendar)
+    val monthlyAverage = if (monthlyData.isNotEmpty()) {
+        monthlyData.map { it.spend }.sum() / monthlyData.size
+    } else 0f
+
+    return Triple(monthlyAverage, weeklyAverage, dailyAverage)
+}
+
+fun calculateTotalBudget(budget: Budget): String {
+    val budgetList = listOf(
+        budget.food?.toDouble() ?: 0.0,
+        budget.transportation?.toDouble() ?: 0.0,
+        budget.entertainment?.toDouble() ?: 0.0,
+        budget.household?.toDouble() ?: 0.0
+    )
+    return budgetList.sum().toString()
+}
+
+fun getTimeLeft(timestamp: Timestamp?): String {
+    if (timestamp == null) return "No date available"
+
+    val diff = timestamp.toDate().time - System.currentTimeMillis()
+
+    if (diff <= 0) return "Date expired"
+
+    val days = TimeUnit.MILLISECONDS.toDays(diff)
+    val hours = TimeUnit.MILLISECONDS.toHours(diff) % 24
+
+    return "$days days, $hours hours"
+}
+
+fun createProfileForm(user: User): ProfileUpdateReq {
+    return ProfileUpdateReq(
+        balance = user.balance,
+        budget = BudgetReq.fromMap(user.budget.toMap()),
+        monthlyIncome = MonthlyIncome.fromMap(user.monthlyIncome.toMap())
+    )
+}
+
+fun calcOverbudget(used: String, base: String) : Boolean {
+    return used.toDouble() > base.toDouble()
+}
+
 

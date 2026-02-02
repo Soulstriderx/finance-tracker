@@ -21,9 +21,10 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomTextField(
-    label: String,
+    label: String = "",
     value: String,
     isPassword: Boolean = false,
+    modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -50,6 +51,6 @@ fun CustomTextField(
         },
         placeholder = { Text(label) },
         singleLine = true,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     )
 }
