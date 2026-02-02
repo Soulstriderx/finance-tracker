@@ -1,13 +1,17 @@
 package com.fwrdgrp.financetracker.data.repo
 
+import com.fwrdgrp.financetracker.data.datautils.calculateBudgetUpdates
+import com.fwrdgrp.financetracker.data.datautils.calculateBudgetUpdatesForEdit
 import com.fwrdgrp.financetracker.data.datautils.calculateDateRange
+import com.fwrdgrp.financetracker.data.datautils.calculateMetricChanges
 import com.fwrdgrp.financetracker.data.datautils.calculateStatsDateRange
-import com.fwrdgrp.financetracker.data.datautils.getNewBalance
+import com.fwrdgrp.financetracker.data.datautils.plus
+import com.fwrdgrp.financetracker.data.datautils.updateUserMetricsAndBudget
 import com.fwrdgrp.financetracker.data.enum.DateFilter
-import com.fwrdgrp.financetracker.data.enum.TransactionType
 import com.fwrdgrp.financetracker.data.model.main.Transaction
 import com.fwrdgrp.financetracker.data.model.main.User
 import com.fwrdgrp.financetracker.data.model.request.LoginReq
+import com.fwrdgrp.financetracker.data.model.request.ProfileUpdateReq
 import com.fwrdgrp.financetracker.data.model.request.RegisterReq
 import com.fwrdgrp.financetracker.data.model.request.TransactionReq
 import com.fwrdgrp.financetracker.service.FirebaseAuthService
@@ -62,22 +66,39 @@ class RepoImpl @Inject constructor(
             ?: throw IllegalStateException("User doesn't exist")
     }
 
+    override suspend fun updateUser(update: ProfileUpdateReq) {
+        userDoc().update(update.toMap())
+    }
+
     override suspend fun addTransaction(transaction: TransactionReq) {
         val user = requireUser()
-        val newBalance = if (transaction.type == TransactionType.Expense) {
-            (user.balance.toDouble() - transaction.amount.toDouble()).toString()
-        } else {
-            (user.balance.toDouble() + transaction.amount.toDouble()).toString()
-        }
+
+        val metricChanges = transaction.type.calculateMetricChanges(
+            amount = transaction.amount.toDouble()
+        )
+
+        val budgetUpdates = transaction.category.calculateBudgetUpdates(
+            amount = transaction.amount.toDouble(),
+            type = transaction.type,
+            timestamp = transaction.timestamp ?: Timestamp.now(),
+            budget = user.budget,
+            isAdding = true
+        )
+
         val transactionRef = userDoc()
             .collection("transactions")
             .document()
 
-        val transactionWithId = transaction.copy(
-            uid = transactionRef.id
+        val transactionWithId = transaction.copy(uid = transactionRef.id)
+
+        userDoc().updateUserMetricsAndBudget(
+            metricChanges = metricChanges,
+            budgetUpdates = budgetUpdates,
+            currentBalance = user.balance.toDouble(),
+            currentLifetimeSpend = user.lifetimeSpend.toDouble(),
+            currentLifetimeIncome = user.lifetimeIncome.toDouble()
         )
 
-        userDoc().update("balance", newBalance)
         transactionRef.set(transactionWithId.toMap()).await()
     }
 
@@ -87,41 +108,81 @@ class RepoImpl @Inject constructor(
         val oldAmount = transaction.amount.toDouble()
         val newAmount = transaction.newAmount.toDouble()
 
-        val updatedAmount = getNewBalance(
-            oldAmount,
-            newAmount,
-            transaction.type,
-            transaction.newType
+        val oldMetricChanges = transaction.type.calculateMetricChanges(
+            amount = oldAmount,
+            isAdding = false
         )
-        val newBalance = user.balance.toDouble() + updatedAmount
 
-        userDoc().update("balance", newBalance.toString())
-        userDoc().collection("transactions").document(transaction.uid)
-            .update(transaction.toEditMap())
+        val newMetricChanges = transaction.newType.calculateMetricChanges(
+            amount = newAmount,
+            isAdding = true
+        )
+
+        val totalMetricChanges = oldMetricChanges + newMetricChanges
+
+        val budgetUpdates = transaction.category.calculateBudgetUpdatesForEdit(
+            oldAmount = oldAmount,
+            oldType = transaction.type,
+            oldTimestamp = transaction.timestamp ?: Timestamp.now(),
+            newCategory = transaction.newCategory,
+            newAmount = newAmount,
+            newType = transaction.newType,
+            newTimestamp = transaction.newTimestamp ?: transaction.timestamp ?: Timestamp.now(),
+            budget = user.budget
+        )
+
+        userDoc().updateUserMetricsAndBudget(
+            metricChanges = totalMetricChanges,
+            budgetUpdates = budgetUpdates,
+            currentBalance = user.balance.toDouble(),
+            currentLifetimeSpend = user.lifetimeSpend.toDouble(),
+            currentLifetimeIncome = user.lifetimeIncome.toDouble()
+        )
+        val transactionRef = userDoc()
+            .collection("transactions")
+            .document(transaction.uid)
+
+        transactionRef.update(transaction.toEditMap()).await()
     }
 
     override suspend fun deleteTransaction(uid: String, transaction: Transaction) {
         val user = requireUser()
         val transactionRef = userDoc().collection("transactions")
-        if (transaction.type == TransactionType.Expense) {
-            val balance = (user.balance.toDouble() + transaction.amount.toDouble()).toString()
-            userDoc().update("balance", balance).await()
-        } else {
-            val balance = (user.balance.toDouble() - transaction.amount.toDouble()).toString()
-            userDoc().update("balance", balance).await()
-        }
+        val metricChanges = transaction.type.calculateMetricChanges(
+            amount = transaction.amount.toDouble(),
+            isAdding = false
+        )
+
+        val budgetUpdates = transaction.category.calculateBudgetUpdates(
+            amount = transaction.amount.toDouble(),
+            type = transaction.type,
+            timestamp = transaction.timestamp ?: Timestamp.now(),
+            budget = user.budget,
+            isAdding = false
+        )
+        userDoc().updateUserMetricsAndBudget(
+            metricChanges = metricChanges,
+            budgetUpdates = budgetUpdates,
+            currentBalance = user.balance.toDouble(),
+            currentLifetimeSpend = user.lifetimeSpend.toDouble(),
+            currentLifetimeIncome = user.lifetimeIncome.toDouble()
+        )
 
         transactionRef.document(uid).delete().await()
     }
 
     override suspend fun fetchCustomCategories(): List<String> {
-        val categoriesDoc = userDoc().collection("custom_category").document("categories")
+        val categoriesDoc = userDoc()
+            .collection("custom_category")
+            .document("categories")
         val snapshot = categoriesDoc.get().await()
         return snapshot.get("categories") as? List<String> ?: emptyList()
     }
 
     override suspend fun addCustomCategory(customCat: String) {
-        val categoriesDoc = userDoc().collection("custom_category").document("categories")
+        val categoriesDoc = userDoc()
+            .collection("custom_category")
+            .document("categories")
         categoriesDoc.set(
             mapOf("categories" to FieldValue.arrayUnion(customCat)),
             SetOptions.merge()
@@ -129,7 +190,9 @@ class RepoImpl @Inject constructor(
     }
 
     override suspend fun deleteCustomCategory(customCat: String) {
-        val categoriesDoc = userDoc().collection("custom_category").document("categories")
+        val categoriesDoc = userDoc()
+            .collection("custom_category")
+            .document("categories")
 
         categoriesDoc.update(
             "categories",

@@ -27,7 +27,7 @@ fun ExpenseRow(item: Transaction, navToDetails: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 24.dp)
             .clickable(onClick = { navToDetails(item.uid) }),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically

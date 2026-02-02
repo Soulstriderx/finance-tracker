@@ -20,4 +20,6 @@ sealed class Screen {
     data class TranDetails(val uid: String): Screen()
     @Serializable
     object Stats: Screen()
+    @Serializable
+    object Profile: Screen()
 }

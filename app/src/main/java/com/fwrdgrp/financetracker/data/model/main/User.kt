@@ -5,6 +5,9 @@ data class User(
     val name: String = "",
     val email: String = "",
     val monthlyIncome: MonthlyIncome = MonthlyIncome(),
+    val budget: Budget = Budget(),
+    val lifetimeSpend: String = "0",
+    val lifetimeIncome: String = "0",
     val balance: String = ""
 ) {
     companion object {
@@ -16,6 +19,11 @@ data class User(
                 monthlyIncome = (map["monthlyIncome"] as? Map<String, Any>)?.let {
                     MonthlyIncome.fromMap(it)
                 } ?: MonthlyIncome(),
+                budget = (map["budget"] as? Map<String, String>)?.let {
+                    Budget.fromMap(it)
+                } ?: Budget(),
+                lifetimeSpend = map["lifetimeSpend"] as? String ?: "0",
+                lifetimeIncome = map["lifetimeIncome"] as? String ?: "0",
                 balance = map["balance"] as? String ?: ""
             )
         }

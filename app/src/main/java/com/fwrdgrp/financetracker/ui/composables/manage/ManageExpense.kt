@@ -129,11 +129,13 @@ fun ManageExpense(
             ) {
                 TabButtons(
                     tabs,
-                    form.category,
+                    if (isEditing) form.newCategory else form.category,
                     isIconButton = true,
                     iconLabel = { it.icon },
                     colorLabel = { it.color },
-                ) { form = form.copy(category = it) }
+                ) {
+                    form = if (isEditing) form.copy(newCategory = it) else form.copy(category = it)
+                }
             }
 
             if (form.category == Category.Other) {
@@ -168,7 +170,13 @@ fun ManageExpense(
                     val timestamp = Timestamp(calendar.time)
                     val derivedDate = deriveDateFields(calendar.timeInMillis)
                     timestampCalendar = calendar
-                    form = form.copy(
+                    form = if (isEditing) form.copy(
+                        newTimestamp = timestamp,
+                        year = derivedDate.year,
+                        month = derivedDate.month,
+                        day = derivedDate.day,
+                        week = derivedDate.week
+                    ) else form.copy(
                         timestamp = timestamp,
                         year = derivedDate.year,
                         month = derivedDate.month,
