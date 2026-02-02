@@ -2,6 +2,7 @@ package com.fwrdgrp.financetracker.data.repo
 
 import com.fwrdgrp.financetracker.data.datautils.calculateDateRange
 import com.fwrdgrp.financetracker.data.datautils.calculateStatsDateRange
+import com.fwrdgrp.financetracker.data.datautils.getNewBalance
 import com.fwrdgrp.financetracker.data.enum.DateFilter
 import com.fwrdgrp.financetracker.data.enum.TransactionType
 import com.fwrdgrp.financetracker.data.model.main.Transaction
@@ -57,12 +58,39 @@ class RepoImpl @Inject constructor(
         } else {
             (user.balance.toDouble() + transaction.amount.toDouble()).toString()
         }
-        dbRef.document(user.uid).update("balance", newBalance)
-        dbRef.document(user.uid)
+        val userDoc = dbRef.document(user.uid)
+        val transactionRef = userDoc
             .collection("transactions")
             .document()
-            .set(transaction.toMap())
-            .await()
+
+        val transactionWithId = transaction.copy(
+            uid = transactionRef.id
+        )
+
+        userDoc.update("balance", newBalance)
+        transactionRef.set(transactionWithId.toMap()).await()
+    }
+
+    override suspend fun editTransaction(transaction: TransactionReq) {
+        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
+
+        val oldAmount = transaction.amount.toDouble()
+        val newAmount = transaction.newAmount.toDouble()
+
+        val userDoc = dbRef.document(user.uid)
+        val updatedAmount = getNewBalance(
+            oldAmount,
+            newAmount,
+            transaction.type,
+            transaction.newType
+        )
+        val newBalance = user.balance.toDouble() + updatedAmount
+
+
+
+        userDoc.update("balance", newBalance.toString())
+        userDoc.collection("transactions").document(transaction.uid)
+            .update(transaction.toEditMap())
     }
 
     override suspend fun fetchMyTransactions(): Flow<List<Transaction>> = callbackFlow {

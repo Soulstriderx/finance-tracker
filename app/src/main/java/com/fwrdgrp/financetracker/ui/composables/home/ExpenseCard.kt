@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.fwrdgrp.financetracker.data.model.main.Transaction
 
 @Composable
-fun ExpenseCard(transaction: List<Transaction>) {
+fun ExpenseCard(transaction: List<Transaction>, navToDetails: (String) -> Unit) {
     if (transaction.isNotEmpty()) {
         Column(
             modifier = Modifier
@@ -41,7 +41,7 @@ fun ExpenseCard(transaction: List<Transaction>) {
             HorizontalDivider(thickness = 1.dp)
 
             transaction.forEachIndexed { index, item ->
-                ExpenseRow(item)
+                ExpenseRow(item, { navToDetails(it) })
                 if (index < transaction.size - 1) {
                     HorizontalDivider(
                         thickness = 1.dp,

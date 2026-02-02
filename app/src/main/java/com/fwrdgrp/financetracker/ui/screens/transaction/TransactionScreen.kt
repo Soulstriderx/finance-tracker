@@ -28,6 +28,7 @@ import com.fwrdgrp.financetracker.data.enum.DateFilter
 import com.fwrdgrp.financetracker.ui.composables.general.SelectionButtons
 import com.fwrdgrp.financetracker.ui.composables.home.ExpenseRow
 import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
+import com.fwrdgrp.financetracker.ui.navigation.Screen
 import com.fwrdgrp.financetracker.ui.uiutils.toFullTextDate
 import com.fwrdgrp.financetracker.ui.uiutils.toMonthRangeText
 import com.fwrdgrp.financetracker.ui.uiutils.toWeekRangeText
@@ -89,8 +90,9 @@ fun TransactionScreen(
                     .padding(horizontal = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
+                item { Spacer(Modifier.height(0.dp)) }
                 items(transactions) { item ->
-                    ExpenseRow(item)
+                    ExpenseRow(item, { navController.navigate(Screen.Edit(it)) })
                 }
                 item { Spacer(Modifier.height(100.dp)) }
             }

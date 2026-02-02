@@ -1,5 +1,6 @@
 package com.fwrdgrp.financetracker.ui.composables.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,11 +21,12 @@ import com.fwrdgrp.financetracker.data.model.main.Transaction
 import com.fwrdgrp.financetracker.ui.uiutils.withCommas
 
 @Composable
-fun ExpenseRow(item: Transaction) {
+fun ExpenseRow(item: Transaction, navToDetails: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .clickable(onClick = { navToDetails(item.uid) }),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

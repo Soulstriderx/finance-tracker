@@ -44,57 +44,26 @@ fun BreakdownCard(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Text(
+                "Spending Breakdown - Month",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+            )
+            Spacer(Modifier.height(8.dp))
+            HorizontalDivider(thickness = 1.dp)
+            TabButtons(tabs, selectedTab, { it.name })
+            { onTabSelect(it) }
+            HorizontalDivider(thickness = 1.dp)
             if (pieData.isNotEmpty()) {
-
-                Text(
-                    "Spending Breakdown - Month",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                )
-                Spacer(Modifier.height(8.dp))
-                HorizontalDivider(thickness = 1.dp)
-                TabButtons(tabs, selectedTab, { it.name })
-                { onTabSelect(it) }
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(48.dp),
-//                    horizontalArrangement = Arrangement.SpaceEvenly
-//                ) {
-//                    tabs.forEachIndexed { index, tab ->
-//                        Box(
-//                            modifier = Modifier
-//                                .weight(1f)
-//                                .fillMaxSize()
-//                                .background(
-//                                    color = if (selectedTab == index) Color.Black
-//                                    else Color.White
-//                                )
-//                                .clickable { onTabSelect(index) },
-//                            contentAlignment = Alignment.Center
-//                        ) {
-//                            Text(
-//                                text = tab,
-//                                fontSize = 14.sp,
-//                                color = if (selectedTab == index) Color.White
-//                                else Color.Black
-//                            )
-//                        }
-//                        if (index < tabs.size - 1) {
-//                            VerticalDivider(thickness = 1.dp, modifier = Modifier.height(48.dp))
-//                        }
-//                    }
-//                }
-                HorizontalDivider(thickness = 1.dp)
                 PieChart(
                     data = pieData,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(16.dp)
                 )
             } else {
+                Spacer(Modifier.height(24.dp))
                 Text("Add a transaction", textAlign = TextAlign.Center)
                 Text("to see the breakdown", textAlign = TextAlign.Center)
+                Spacer(Modifier.height(24.dp))
             }
         }
     }
