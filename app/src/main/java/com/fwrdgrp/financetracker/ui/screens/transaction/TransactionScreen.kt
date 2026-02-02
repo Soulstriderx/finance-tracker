@@ -92,7 +92,12 @@ fun TransactionScreen(
             ) {
                 item { Spacer(Modifier.height(0.dp)) }
                 items(transactions) { item ->
-                    ExpenseRow(item, { navController.navigate(Screen.Edit(it)) })
+                    ExpenseRow(
+                        item,
+                        {
+                            navController.navigate(Screen.TranDetails(it))
+                        }
+                    )
                 }
                 item { Spacer(Modifier.height(100.dp)) }
             }

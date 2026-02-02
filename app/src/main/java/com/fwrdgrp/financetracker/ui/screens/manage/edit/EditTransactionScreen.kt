@@ -19,6 +19,9 @@ fun EditTransactionScreen(
 ) {
     LaunchedEffect(Unit) {
         viewModel.finish.collect {
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("transaction_updated", true)
             navController.popBackStack()
         }
     }

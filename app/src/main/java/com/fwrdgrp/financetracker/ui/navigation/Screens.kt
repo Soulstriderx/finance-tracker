@@ -17,5 +17,7 @@ sealed class Screen {
     @Serializable
     object Transaction: Screen()
     @Serializable
+    data class TranDetails(val uid: String): Screen()
+    @Serializable
     object Stats: Screen()
 }

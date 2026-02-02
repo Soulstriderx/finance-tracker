@@ -93,6 +93,16 @@ class RepoImpl @Inject constructor(
             .update(transaction.toEditMap())
     }
 
+    override suspend fun deleteTransaction(uid: String) {
+        val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
+        val transactionRef = dbRef
+            .document(user.uid)
+            .collection("transactions")
+
+        transactionRef.document(uid).delete().await()
+    }
+
+
     override suspend fun fetchMyTransactions(): Flow<List<Transaction>> = callbackFlow {
         val user = authService.getCurrentUser() ?: throw Exception("User doesn't exist")
         val snapshot = dbRef
