@@ -5,15 +5,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fwrdgrp.financetracker.data.datautils.deriveDateFields
@@ -34,7 +37,9 @@ import com.fwrdgrp.financetracker.data.enum.Category
 import com.fwrdgrp.financetracker.data.enum.PaymentMethod
 import com.fwrdgrp.financetracker.data.enum.TransactionType
 import com.fwrdgrp.financetracker.data.model.request.TransactionReq
+import com.fwrdgrp.financetracker.ui.composables.general.MediumTitleText
 import com.fwrdgrp.financetracker.ui.composables.general.TabButtons
+import com.fwrdgrp.financetracker.ui.composables.input.AddCustomCategoryDialog
 import com.fwrdgrp.financetracker.ui.composables.input.CustomDropdown
 import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
@@ -47,7 +52,12 @@ fun ManageExpense(
     newForm: TransactionReq,
     showDialog: Boolean,
     onDialogChange: (Boolean) -> Unit,
+    showCustomDialog: Boolean,
+    onCustomDialogChange: (Boolean) -> Unit,
+    onAddCustomCategory: (String) -> Unit,
+    onDeleteCustomCategory: (String) -> Unit,
     isEditing: Boolean = false,
+    customCategories: List<String>,
     onCancel: () -> Unit,
     onSubmit: (TransactionReq) -> Unit,
 ) {
@@ -72,6 +82,11 @@ fun ManageExpense(
         )
     }
 
+    if (showCustomDialog) {
+        AddCustomCategoryDialog({ onCustomDialogChange(false) })
+        { onAddCustomCategory(it) }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -82,11 +97,7 @@ fun ManageExpense(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                "Transaction Type",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+            MediumTitleText("Transaction Type")
             Spacer(Modifier.height(8.dp))
             Box(
                 modifier = Modifier
@@ -102,20 +113,12 @@ fun ManageExpense(
                 ) { form = if (isEditing) form.copy(newType = it) else form.copy(type = it) }
             }
             Spacer(Modifier.height(16.dp))
-            Text(
-                "Amount",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+            MediumTitleText("Amount")
             CustomTextField("Amount", if (isEditing) form.newAmount else form.amount)
             { form = if (isEditing) form.copy(newAmount = it) else form.copy(amount = it) }
 
             Spacer(Modifier.height(16.dp))
-            Text(
-                "Category",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+            MediumTitleText("Category")
             Spacer(Modifier.height(8.dp))
             Box(
                 modifier = Modifier
@@ -132,12 +135,31 @@ fun ManageExpense(
                     colorLabel = { it.color },
                 ) { form = form.copy(category = it) }
             }
+
+            if (form.category == Category.Other) {
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        CustomDropdown(
+                            customCategories,
+                            form.customCategory ?: "Select a Custom Category",
+                            itemLabel = { it },
+                            onDeleteItem = { onDeleteCustomCategory(it) }
+                        ) { form = form.copy(customCategory = it) }
+                    }
+                    IconButton(
+                        onClick = { onCustomDialogChange(true) }
+                    ) {
+                        Icon(Icons.Filled.Add, null)
+                    }
+                }
+            }
+
             Spacer(Modifier.height(16.dp))
-            Text(
-                "Date",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+            MediumTitleText("Date")
             Spacer(Modifier.height(8.dp))
             DatePicker(
                 selectedDate = timestampCalendar?.toFullTextDate() ?: "",
@@ -156,19 +178,11 @@ fun ManageExpense(
                 }
             )
             Spacer(Modifier.height(16.dp))
-            Text(
-                "Note",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+            MediumTitleText("Note")
             CustomTextField("Note", form.note)
             { form = form.copy(note = it) }
             Spacer(Modifier.height(16.dp))
-            Text(
-                "Payment Method",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+            MediumTitleText("Payment Method")
             Spacer(Modifier.height(8.dp))
             CustomDropdown(
                 items = PaymentMethod.entries,

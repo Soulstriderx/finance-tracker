@@ -68,7 +68,7 @@ fun TransactionDetailsScreen(
     val transaction by viewModel.transaction.collectAsStateWithLifecycle()
 
     transaction?.let { transaction ->
-        TransactionDetails(transaction, viewModel::deleteTransaction)
+        TransactionDetails(transaction, { viewModel.deleteTransaction(transaction) })
         { navController.navigate(Screen.Edit(transaction.uid)) }
     }
 }
@@ -116,6 +116,10 @@ fun TransactionDetails(transaction: Transaction, onDelete: () -> Unit, onEdit: (
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Chip(transaction.category.name, transaction.category.icon)
+                    if (transaction.customCategory != null) {
+                        Spacer(Modifier.width(8.dp))
+                        Chip(transaction.customCategory)
+                    }
                     Spacer(Modifier.width(8.dp))
                     Chip(transaction.type.name)
                 }

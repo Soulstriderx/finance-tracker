@@ -11,6 +11,7 @@ data class TransactionReq(
     val type: TransactionType = TransactionType.Expense,
     val method: PaymentMethod = PaymentMethod.Cash,
     val category: Category = Category.Food,
+    val customCategory: String? = null,
     val newAmount: String = "",
     val amount: String = "",
     val note: String = "",
@@ -34,6 +35,7 @@ data class TransactionReq(
             "week" to week
         )
         timestamp?.let { map["timestamp"] = it }
+        customCategory?.let { map["customCategory"] = it }
         return map
     }
 
@@ -51,6 +53,7 @@ data class TransactionReq(
             "week" to week
         )
         timestamp?.let { map["timestamp"] = it }
+        customCategory?.let { map["customCategory"] = it }
         return map
     }
 }
