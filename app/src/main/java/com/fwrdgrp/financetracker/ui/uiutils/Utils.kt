@@ -19,6 +19,7 @@ import com.google.firebase.Timestamp
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
@@ -88,6 +89,32 @@ fun Calendar.toFullTextDate(): String {
     return "${getDayWithSuffix(this.get(Calendar.DAY_OF_MONTH))} of ${
         months[this.get(Calendar.MONTH)]
     }, ${this.get(Calendar.YEAR)}"
+}
+
+fun Calendar.toDateRange(endCalInLong: Long): String {
+    val endCal = Timestamp(Date(endCalInLong)).toCalendar()
+    val sameYear = get(Calendar.YEAR) == endCal.get(Calendar.YEAR)
+    val sameMonth = sameYear && get(Calendar.MONTH) == endCal.get(Calendar.MONTH)
+
+    return when {
+        sameMonth -> {
+            val start = SimpleDateFormat("dd", Locale.getDefault()).format(time)
+            val end = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(endCal.time)
+            "$start–$end"
+        }
+
+        sameYear -> {
+            val start = SimpleDateFormat("dd MMM", Locale.getDefault()).format(time)
+            val end = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(endCal.time)
+            "$start – $end"
+        }
+
+        else -> {
+            val start = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(time)
+            val end = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(endCal.time)
+            "$start – $end"
+        }
+    }
 }
 
 fun Calendar.toWeekRangeText(): String {
@@ -492,6 +519,32 @@ fun getLowBudgetWarning(budget: Budget): String? {
 
     return if (parts.isEmpty()) null
     else parts.joinToString(". ")
+}
+
+fun toRange(filter: DateFilter): Pair<Long, Long> {
+    val endCal = Calendar.getInstance()
+    val startCal = endCal.clone() as Calendar
+
+    when (filter) {
+        DateFilter.Daily -> {
+            startCal.apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+        }
+
+        DateFilter.Weekly -> {
+            startCal.add(Calendar.DAY_OF_YEAR, -7)
+        }
+
+        DateFilter.Monthly -> {
+            startCal.add(Calendar.DAY_OF_YEAR, -30)
+        }
+    }
+
+    return startCal.timeInMillis to endCal.timeInMillis
 }
 
 

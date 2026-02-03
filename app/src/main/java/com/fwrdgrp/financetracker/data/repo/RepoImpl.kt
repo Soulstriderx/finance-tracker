@@ -267,6 +267,20 @@ class RepoImpl @Inject constructor(
         awaitClose { snapshot.remove() }
     }
 
+    override suspend fun fetchTransactionsByRange(
+        start: Long,
+        end: Long
+    ): List<Transaction> {
+        val snapshot = userDoc().collection("transactions")
+            .whereGreaterThanOrEqualTo("timestamp", Timestamp(Date(start)))
+            .whereLessThan("timestamp", Timestamp(Date(end)))
+            .orderBy("timestamp", Query.Direction.DESCENDING).get().await()
+
+        return snapshot.documents.mapNotNull {
+            it.toObject(Transaction::class.java)
+        }
+    }
+
     override suspend fun budgetRollover(newTimestamp: Timestamp) {
         userDoc().update(
             mapOf(
