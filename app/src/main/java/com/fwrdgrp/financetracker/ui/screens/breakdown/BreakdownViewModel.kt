@@ -1,6 +1,5 @@
 package com.fwrdgrp.financetracker.ui.screens.breakdown
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.fwrdgrp.financetracker.data.model.main.Transaction
@@ -34,7 +33,6 @@ class BreakdownViewModel @Inject constructor(
     }
 
     private fun fetchTransactions() {
-        Log.d("debug", Timestamp(Date(start)).toCalendar().toDateRange(end))
         viewModelScope.launch {
             safeApiCall {
                 repo.fetchTransactionsByRange(start, end).let { trans ->
