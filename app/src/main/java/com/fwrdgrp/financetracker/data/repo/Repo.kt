@@ -8,6 +8,7 @@ import com.fwrdgrp.financetracker.data.model.request.LoginReq
 import com.fwrdgrp.financetracker.data.model.request.ProfileUpdateReq
 import com.fwrdgrp.financetracker.data.model.request.RegisterReq
 import com.fwrdgrp.financetracker.data.model.request.TransactionReq
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.Flow
 import java.util.Calendar
 
@@ -35,4 +36,6 @@ interface Repo {
         referenceDate: Calendar,
         isStats: Boolean
     ): Flow<List<Transaction>>
+
+    suspend fun budgetRollover(newTimestamp: Timestamp)
 }

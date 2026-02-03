@@ -2,6 +2,7 @@ package com.fwrdgrp.financetracker.ui.uiutils
 
 import com.fwrdgrp.financetracker.data.datautils.deriveDateFields
 import com.fwrdgrp.financetracker.data.enum.BarData
+import com.fwrdgrp.financetracker.data.enum.BudgetStatus
 import com.fwrdgrp.financetracker.data.enum.Category
 import com.fwrdgrp.financetracker.data.enum.DateFilter
 import com.fwrdgrp.financetracker.data.enum.TransactionType
@@ -403,8 +404,94 @@ fun createProfileForm(user: User): ProfileUpdateReq {
     )
 }
 
-fun calcOverbudget(used: String, base: String) : Boolean {
+fun calcOverbudget(used: String, base: String): Boolean {
     return used.toDouble() > base.toDouble()
+}
+
+fun shouldRollover(budget: Budget): Boolean {
+    val currentRefreshCalendar = budget.refresh?.toCalendar() ?: return false
+    val today = Calendar.getInstance()
+    val hasRefreshDatePassed = currentRefreshCalendar.timeInMillis <= today.timeInMillis
+
+    return hasRefreshDatePassed
+}
+
+fun calculateNextRefreshTimestamp(originalRefreshDay: Int): Timestamp {
+    val nextRefreshCalendar = Calendar.getInstance().apply {
+        add(Calendar.MONTH, 1)
+
+        val maxDayInNextMonth = getActualMaximum(Calendar.DAY_OF_MONTH)
+        val targetDay = minOf(originalRefreshDay, maxDayInNextMonth)
+
+        set(Calendar.DAY_OF_MONTH, targetDay)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+
+    return nextRefreshCalendar.toTimestamp()
+}
+
+fun getLowBudgetWarning(budget: Budget): String? {
+    fun getStatus(used: String?, total: String?): BudgetStatus? {
+        val usedVal = used?.toDoubleOrNull() ?: return null
+        val totalVal = total?.toDoubleOrNull() ?: return null
+
+        if (totalVal == 0.0) return null
+
+        val percentUsed = (usedVal / totalVal) * 100
+
+        return when {
+            percentUsed >= 100 -> BudgetStatus.EXCEEDED
+            percentUsed >= 90 -> BudgetStatus.EXCEEDING
+            percentUsed >= 80 -> BudgetStatus.NEARING
+            else -> null
+        }
+    }
+
+    val nearing = mutableListOf<String>()
+    val exceeding = mutableListOf<String>()
+    val exceeded = mutableListOf<String>()
+
+    fun check(name: String, used: String?, total: String?) {
+        when (getStatus(used, total)) {
+            BudgetStatus.NEARING -> nearing.add(name)
+            BudgetStatus.EXCEEDING -> exceeding.add(name)
+            BudgetStatus.EXCEEDED -> exceeded.add(name)
+            null -> {}
+        }
+    }
+
+    check("Food", budget.foodUsed, budget.food)
+    check("Transportation", budget.transportationUsed, budget.transportation)
+    check("Entertainment", budget.entertainmentUsed, budget.entertainment)
+    check("Household", budget.householdUsed, budget.household)
+
+    fun format(list: List<String>): String =
+        when (list.size) {
+            0 -> ""
+            1 -> list[0]
+            2 -> "${list[0]} and ${list[1]}"
+            else -> "${list.dropLast(1).joinToString(", ")} and ${list.last()}"
+        }
+
+    val parts = mutableListOf<String>()
+
+    if (exceeded.isNotEmpty()) {
+        parts.add("${format(exceeded)} exceeded the budget")
+    }
+
+    if (exceeding.isNotEmpty()) {
+        parts.add("${format(exceeding)} is exceeding the budget")
+    }
+
+    if (nearing.isNotEmpty()) {
+        parts.add("${format(nearing)} is nearing the budget limit")
+    }
+
+    return if (parts.isEmpty()) null
+    else parts.joinToString(". ")
 }
 
 

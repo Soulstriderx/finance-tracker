@@ -7,6 +7,7 @@ import com.fwrdgrp.financetracker.data.model.main.User
 import com.fwrdgrp.financetracker.data.repo.Repo
 import com.fwrdgrp.financetracker.service.FirebaseAuthService
 import com.fwrdgrp.financetracker.ui.screens.base.BaseViewModel
+import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Job
@@ -84,5 +85,15 @@ class HomeViewModel @Inject constructor(
     fun onDateFilterSelect(filter: DateFilter, calendar: Calendar) {
         _dateFilter.update { filter }
         fetchTransactions(calendar)
+    }
+
+    fun budgetRollover(newTimestamp: Timestamp) {
+        viewModelScope.launch {
+            safeApiCall {
+                repo.budgetRollover(newTimestamp).let {
+
+                }
+            }
+        }
     }
 }
