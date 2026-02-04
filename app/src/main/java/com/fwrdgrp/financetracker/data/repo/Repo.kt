@@ -50,4 +50,5 @@ interface Repo {
     suspend fun deleteBill(uid: String)
     suspend fun editBill(bill: BillReq)
     suspend fun deletePaymentRecord(bill: Bill, paymentUid: String)
+    fun removeAllListeners()
 }

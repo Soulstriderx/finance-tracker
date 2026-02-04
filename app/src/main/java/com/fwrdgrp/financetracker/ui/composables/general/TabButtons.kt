@@ -21,6 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fwrdgrp.financetracker.ui.theme.AlmostBlack
+import com.fwrdgrp.financetracker.ui.theme.CreamyTan
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
 
 @Composable
 fun <T> TabButtons(
@@ -44,8 +47,8 @@ fun <T> TabButtons(
                     .weight(1f)
                     .fillMaxSize()
                     .background(
-                        color = if (selectedTab == tab) Color.Black
-                        else Color.White
+                        color = if (selectedTab == tab) AlmostBlack
+                        else CreamyTan
                     )
                     .clickable { onTabSelect(tab) },
                 contentAlignment = Alignment.Center
@@ -61,13 +64,17 @@ fun <T> TabButtons(
                     Text(
                         text = label(tab),
                         fontSize = 14.sp,
-                        color = if (selectedTab == tab) Color.White
-                        else Color.Black
+                        color = if (selectedTab == tab) OffWhite
+                        else AlmostBlack
                     )
                 }
             }
             if (index < tabs.size - 1) {
-                VerticalDivider(thickness = 1.dp, modifier = Modifier.height(48.dp))
+                VerticalDivider(
+                    thickness = 1.dp,
+                    modifier = Modifier.height(48.dp),
+                    color = AlmostBlack
+                )
             }
         }
     }

@@ -20,10 +20,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.fwrdgrp.financetracker.ui.navigation.Screen
+import com.fwrdgrp.financetracker.ui.theme.CreamyTan
+import com.fwrdgrp.financetracker.ui.theme.Jeremy
 
 @Composable
 fun BottomNavBar(
@@ -32,7 +33,7 @@ fun BottomNavBar(
 ) {
     var page by remember { mutableStateOf(0) }
     NavigationBar(
-        containerColor = Color(0xFFF5EFE6)
+        containerColor = Jeremy
     ) {
         if (page == 0) {
             NavigationBarItem(
@@ -108,7 +109,7 @@ fun BottomNavBar(
             )
             NavigationBarItem(
                 selected = page == 99,
-                onClick = {  },
+                onClick = { },
                 icon = { Icon(Icons.Default.QuestionMark, null) },
                 label = { Text("Soon") }
             )

@@ -32,7 +32,7 @@ fun CustomTextField(
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(it) },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(8.dp),
         visualTransformation = if(isPassword) {
             if (!visible) PasswordVisualTransformation()
             else VisualTransformation.None

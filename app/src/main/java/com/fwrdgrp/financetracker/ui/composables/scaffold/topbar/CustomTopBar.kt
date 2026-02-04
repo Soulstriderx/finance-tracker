@@ -1,4 +1,4 @@
-package com.fwrdgrp.financetracker.ui.composables.scaffold
+package com.fwrdgrp.financetracker.ui.composables.scaffold.topbar
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,21 +20,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.fwrdgrp.financetracker.service.FirebaseAuthService
 import com.fwrdgrp.financetracker.ui.navigation.Screen
 
 @Composable
 fun CustomTopBar(
     navController: NavController,
+    modifier: Modifier = Modifier,
     label: String = "",
     showBackButton: Boolean,
     showLogout: Boolean,
-    authService: FirebaseAuthService
+    viewModel: TopBarViewModel = hiltViewModel()
 ) {
     val size = 28.dp
     Box(
-        contentAlignment = Alignment.Center, modifier = Modifier
+        contentAlignment = Alignment.Center, modifier = modifier
             .fillMaxWidth()
             .padding(
                 vertical = 10.dp, horizontal = 16.dp
@@ -64,7 +65,7 @@ fun CustomTopBar(
                 if (showLogout) {
                     IconButton(
                         onClick = {
-                            authService.signout()
+                            viewModel.signOut()
                             navController.navigate(Screen.Login) {
                                 popUpTo(0) { inclusive = true }
                             }

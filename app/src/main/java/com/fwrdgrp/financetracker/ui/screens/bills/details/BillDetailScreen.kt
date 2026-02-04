@@ -1,5 +1,6 @@
 package com.fwrdgrp.financetracker.ui.screens.bills.details
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,31 +15,56 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.fwrdgrp.financetracker.ui.composables.input.DeleteDialog
 import com.fwrdgrp.financetracker.ui.composables.manage.ManageBillDialog
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
+import com.fwrdgrp.financetracker.ui.theme.Terracotta
 import com.fwrdgrp.financetracker.ui.uiutils.createBillReqWithBill
 import com.fwrdgrp.financetracker.ui.uiutils.getTimeLeft
 
 @Composable
 fun BillDetailScreen(
+    navController: NavController,
     viewModel: BillDetailViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.finish.collect {
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("bills_updated", true)
+            navController.popBackStack()
+        }
+    }
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.toast.collect { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     var showDialog by remember { mutableStateOf(false) }
+    var showDelete by remember { mutableStateOf(false) }
+    var showRecordDelete by remember { mutableStateOf(false) }
     var showDateDialog by remember { mutableStateOf(false) }
     val bill by viewModel.bill.collectAsStateWithLifecycle()
 
@@ -50,9 +76,21 @@ fun BillDetailScreen(
                 form = createBillReqWithBill(bill),
                 showDateDialog = showDateDialog,
                 onDateDialogChange = { showDateDialog = it },
-                onDismiss = { showDialog = false }) { viewModel.editBill(it) }
+                onDismiss = { showDialog = false }) {
+                if (viewModel.validateBill(it, true)) {
+                    viewModel.editBill(it)
+                    showDialog = false
+                }
+            }
         }
 
+        DeleteDialog(
+            showDialog = showDelete,
+            title = "Deleting a Bill",
+            { showDelete = it }) {
+            viewModel.deleteBill(bill.uid)
+            showDelete = false
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -105,6 +143,14 @@ fun BillDetailScreen(
                 }
                 item {
                     if (bill.paymentHistory.isNotEmpty()) {
+                        var selectedPayment by remember { mutableStateOf("") }
+                        DeleteDialog(
+                            showDialog = showRecordDelete,
+                            title = "Deleting a Payment Record",
+                            { showRecordDelete = it }) {
+                            viewModel.deletePayment(bill, selectedPayment)
+                            showRecordDelete = false
+                        }
                         bill.paymentHistory.forEach { item ->
                             Row(
                                 modifier = Modifier
@@ -114,7 +160,10 @@ fun BillDetailScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(item.monthYear, Modifier.weight(1f))
-                                IconButton(onClick = { viewModel.deletePayment(bill, item.uid) }) {
+                                IconButton(onClick = {
+                                    selectedPayment = item.uid
+                                    showRecordDelete = true
+                                }) {
                                     Icon(Icons.Default.Delete, null)
                                 }
                             }
@@ -152,9 +201,13 @@ fun BillDetailScreen(
                     Text("Edit")
                 }
                 Button(
-                    onClick = { viewModel.deleteBill(bill.uid) },
+                    onClick = { showDelete = true },
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Terracotta,
+                        contentColor = OffWhite
+                    )
                 ) {
                     Text("Delete")
                 }

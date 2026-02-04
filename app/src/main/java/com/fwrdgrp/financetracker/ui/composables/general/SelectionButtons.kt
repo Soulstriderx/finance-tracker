@@ -11,9 +11,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fwrdgrp.financetracker.ui.theme.AlmostBlack
+import com.fwrdgrp.financetracker.ui.theme.CreamyTan
 
 @Composable
 fun <T> SelectionButtons(
@@ -32,8 +33,8 @@ fun <T> SelectionButtons(
             Button(
                 onClick = { onTabSelect(tab) },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedTab == tab) Color.Black else Color.LightGray,
-                    contentColor = if (selectedTab == tab) Color.White else Color.Black
+                    containerColor = if (selectedTab == tab) AlmostBlack else CreamyTan,
+                    contentColor = if (selectedTab == tab) CreamyTan else AlmostBlack
                 ),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier

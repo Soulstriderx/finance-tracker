@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -36,7 +40,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.fwrdgrp.financetracker.data.model.main.Transaction
 import com.fwrdgrp.financetracker.ui.composables.general.Chip
+import com.fwrdgrp.financetracker.ui.composables.input.DeleteDialog
 import com.fwrdgrp.financetracker.ui.navigation.Screen
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
+import com.fwrdgrp.financetracker.ui.theme.Terracotta
 import com.fwrdgrp.financetracker.ui.uiutils.withCommas
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -74,9 +81,21 @@ fun TransactionDetailsScreen(
 }
 
 @Composable
-fun TransactionDetails(transaction: Transaction, onDelete: () -> Unit, onEdit: () -> Unit) {
+fun TransactionDetails(
+    transaction: Transaction,
+    onDelete: () -> Unit,
+    onEdit: () -> Unit
+) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
     val scrollState = rememberScrollState()
+    var showDelete by remember { mutableStateOf(false) }
+
+    DeleteDialog(
+        showDialog = showDelete,
+        title = "Deleting a Transaction",
+        { showDelete = it }) {
+        onDelete()
+    }
 
     Box(
         modifier = Modifier
@@ -183,9 +202,13 @@ fun TransactionDetails(transaction: Transaction, onDelete: () -> Unit, onEdit: (
                 }
                 Spacer(Modifier.width(8.dp))
                 Button(
-                    onClick = { onDelete() },
+                    onClick = { showDelete = true },
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Terracotta,
+                        contentColor = OffWhite
+                    )
                 ) {
                     Text(
                         "Delete",

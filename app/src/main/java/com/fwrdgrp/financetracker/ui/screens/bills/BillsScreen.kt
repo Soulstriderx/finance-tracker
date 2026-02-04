@@ -1,5 +1,6 @@
 package com.fwrdgrp.financetracker.ui.screens.bills
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,12 +11,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,13 +39,35 @@ fun BillsScreen(
     var showDateDialog by remember { mutableStateOf(false) }
     val bills by viewModel.bills.collectAsStateWithLifecycle()
 
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntry?.savedStateHandle?.getStateFlow(
+            "bills_updated",
+            false
+        )?.collect { updated ->
+            if (updated) {
+                viewModel.fetchBills()
+                navController.currentBackStackEntry?.savedStateHandle
+                    ?.set("bills_updated", false)
+            }
+        }
+    }
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.toast.collect { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     if (showDialog) {
         ManageBillDialog(
             form = BillReq(),
             showDateDialog = showDateDialog,
             onDateDialogChange = { showDateDialog = it },
             onDismiss = { showDialog = false }) {
-            viewModel.addBill(it)
+            if (viewModel.validateBill(it, false)) {
+                viewModel.addBill(it)
+                showDialog = false
+            }
         }
     }
 

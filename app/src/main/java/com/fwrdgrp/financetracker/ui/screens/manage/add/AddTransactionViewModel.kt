@@ -31,6 +31,7 @@ class AddTransactionViewModel @Inject constructor(
     fun addTransaction(transaction: TransactionReq) {
         viewModelScope.launch {
             safeApiCall {
+                validateTransaction(transaction, false)
                 repo.addTransaction(transaction).let {
                     _finish.emit(Unit)
                 }

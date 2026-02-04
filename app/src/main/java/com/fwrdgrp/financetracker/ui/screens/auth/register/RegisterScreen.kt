@@ -1,6 +1,7 @@
 package com.fwrdgrp.financetracker.ui.screens.auth.register
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import com.fwrdgrp.financetracker.data.model.main.MonthlyIncome
 import com.fwrdgrp.financetracker.data.model.request.RegisterReq
 import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
 import com.fwrdgrp.financetracker.ui.uiutils.toCalendar
 import com.fwrdgrp.financetracker.ui.uiutils.toRegisterString
 import com.google.firebase.Timestamp
@@ -46,7 +48,6 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
 
     var form by remember { mutableStateOf(RegisterReq()) }
     var income by remember { mutableStateOf(MonthlyIncome()) }
@@ -60,6 +61,7 @@ fun RegisterScreen(
             navController.popBackStack()
         }
     }
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.toast.collect { msg ->
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
@@ -108,7 +110,6 @@ fun Register(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-//            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) /*For Logo*/
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -124,19 +125,24 @@ fun Register(
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(24.dp))
-                CustomTextField("Name", form.name)
+                CustomTextField("Name", form.name,
+                    modifier = Modifier.background(color = OffWhite, shape = RoundedCornerShape(12.dp)))
                 { onFormChange(form.copy(name = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField("Email", form.email)
+                CustomTextField("Email", form.email,
+                    modifier = Modifier.background(color = OffWhite, shape = RoundedCornerShape(12.dp)))
                 { onFormChange(form.copy(email = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField("Password", form.password, isPassword = true)
+                CustomTextField("Password", form.password, isPassword = true,
+                    modifier = Modifier.background(color = OffWhite, shape = RoundedCornerShape(12.dp)))
                 { onFormChange(form.copy(password = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField("Confirm Password", form.password2, isPassword = true)
+                CustomTextField("Confirm Password", form.password2, isPassword = true,
+                    modifier = Modifier.background(color = OffWhite, shape = RoundedCornerShape(12.dp)))
                 { onFormChange(form.copy(password2 = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField("Balance", form.balance ?: "")
+                CustomTextField("Balance", form.balance ?: "",
+                    modifier = Modifier.background(color = OffWhite, shape = RoundedCornerShape(12.dp)))
                 { onFormChange(form.copy(balance = it)) }
                 Spacer(Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -148,7 +154,8 @@ fun Register(
                 }
                 Spacer(Modifier.height(10.dp))
                 if (checked) {
-                    CustomTextField("Monthly Income", income.amount)
+                    CustomTextField("Monthly Income", income.amount,
+                        modifier = Modifier.background(color = OffWhite, shape = RoundedCornerShape(12.dp)))
                     { onIncomeChange(income.copy(amount = it)) }
                     Spacer(Modifier.height(16.dp))
                     DatePicker(

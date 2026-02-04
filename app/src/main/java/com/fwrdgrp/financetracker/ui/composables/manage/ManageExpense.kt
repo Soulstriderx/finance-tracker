@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +44,8 @@ import com.fwrdgrp.financetracker.ui.composables.input.AddCustomCategoryDialog
 import com.fwrdgrp.financetracker.ui.composables.input.CustomDropdown
 import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
+import com.fwrdgrp.financetracker.ui.theme.MutedBrown
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
 import com.fwrdgrp.financetracker.ui.uiutils.toCalendar
 import com.fwrdgrp.financetracker.ui.uiutils.toFullTextDate
 import com.google.firebase.Timestamp
@@ -67,7 +70,10 @@ fun ManageExpense(
     val tabs = Category.entries
 
     var timestampCalendar by remember(form.timestamp) {
-        mutableStateOf(form.timestamp?.toCalendar())
+        mutableStateOf(
+            if (isEditing) form.newTimestamp?.toCalendar()
+            else form.timestamp?.toCalendar()
+        )
     }
 
     if (showDialog) {
@@ -114,7 +120,10 @@ fun ManageExpense(
             }
             Spacer(Modifier.height(16.dp))
             MediumTitleText("Amount")
-            CustomTextField("Amount", if (isEditing) form.newAmount else form.amount)
+            CustomTextField(
+                "Amount", if (isEditing) form.newAmount else form.amount,
+                modifier = Modifier.background(color = OffWhite, shape = RoundedCornerShape(12.dp))
+            )
             { form = if (isEditing) form.copy(newAmount = it) else form.copy(amount = it) }
 
             Spacer(Modifier.height(16.dp))
@@ -141,7 +150,7 @@ fun ManageExpense(
             if (
                 if (isEditing) form.newCategory == Category.Other
                 else form.category == Category.Other
-                ) {
+            ) {
                 Spacer(Modifier.height(16.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -190,7 +199,11 @@ fun ManageExpense(
             )
             Spacer(Modifier.height(16.dp))
             MediumTitleText("Note")
-            CustomTextField("Note", form.note)
+            CustomTextField(
+                "Note",
+                form.note,
+                modifier = Modifier.background(color = OffWhite, shape = RoundedCornerShape(12.dp))
+            )
             { form = form.copy(note = it) }
             Spacer(Modifier.height(16.dp))
             MediumTitleText("Payment Method")
@@ -208,7 +221,7 @@ fun ManageExpense(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 shape = RoundedCornerShape(12.dp),
-                onClick = { onSubmit(form) }
+                onClick = { onSubmit(form) },
             ) {
                 Text(
                     "Save Transaction",
@@ -223,7 +236,11 @@ fun ManageExpense(
                     .height(40.dp),
                 contentPadding = PaddingValues(0.dp),
                 shape = RoundedCornerShape(12.dp),
-                onClick = { onCancel() }
+                onClick = { onCancel() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MutedBrown,
+                    contentColor = OffWhite
+                )
             ) {
                 Text(
                     "Cancel",
