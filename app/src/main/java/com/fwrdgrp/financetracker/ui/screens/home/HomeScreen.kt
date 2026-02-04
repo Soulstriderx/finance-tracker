@@ -27,6 +27,7 @@ import com.fwrdgrp.financetracker.ui.composables.home.BalanceCard
 import com.fwrdgrp.financetracker.ui.composables.home.BreakdownCard
 import com.fwrdgrp.financetracker.ui.composables.home.BudgetCard
 import com.fwrdgrp.financetracker.ui.composables.home.ExpenseCard
+import com.fwrdgrp.financetracker.ui.composables.home.IncomeDialog
 import com.fwrdgrp.financetracker.ui.navigation.Screen
 import com.fwrdgrp.financetracker.ui.uiutils.calculateNextRefreshTimestamp
 import com.fwrdgrp.financetracker.ui.uiutils.shouldRollover
@@ -43,6 +44,7 @@ fun HomeScreen(
     val transactions by viewModel.transactions.collectAsStateWithLifecycle()
     val selectedTab by viewModel.dateFilter.collectAsStateWithLifecycle()
     var calendar by remember { mutableStateOf(Calendar.getInstance()) }
+    val showPrompt by viewModel.showIncomePrompt.collectAsStateWithLifecycle()
 
 
 
@@ -50,9 +52,24 @@ fun HomeScreen(
         LaunchedEffect(Unit) {
             user.budget.let {
                 if (shouldRollover(it)) {
-                    val newTimestamp = calculateNextRefreshTimestamp(it.day ?: 0)
+                    val newTimestamp = calculateNextRefreshTimestamp(it.day ?: 31)
                     viewModel.budgetRollover(newTimestamp)
                 }
+            }
+        }
+        LaunchedEffect(Unit) {
+            user.monthlyIncome.let {
+                if (shouldRollover(it)) {
+                    viewModel.showPrompt()
+                }
+            }
+        }
+        if (showPrompt) {
+            IncomeDialog(user, viewModel::dismissPrompt) {
+                val newTimestamp = calculateNextRefreshTimestamp(
+                    user.monthlyIncome.day ?: 31
+                )
+                viewModel.incomeRollover(newTimestamp)
             }
         }
         Home(

@@ -90,7 +90,15 @@ class HomeViewModel @Inject constructor(
     fun budgetRollover(newTimestamp: Timestamp) {
         viewModelScope.launch {
             safeApiCall {
-                repo.budgetRollover(newTimestamp).let {
+                repo.budgetRollover(newTimestamp)
+            }
+        }
+    }
+
+    fun incomeRollover(newTimestamp: Timestamp) {
+        viewModelScope.launch {
+            safeApiCall {
+                repo.incomeRollover(newTimestamp).let {
 
                 }
             }

@@ -5,6 +5,7 @@ import com.fwrdgrp.financetracker.data.datautils.calculateBudgetUpdatesForEdit
 import com.fwrdgrp.financetracker.data.datautils.calculateDateRange
 import com.fwrdgrp.financetracker.data.datautils.calculateMetricChanges
 import com.fwrdgrp.financetracker.data.datautils.calculateStatsDateRange
+import com.fwrdgrp.financetracker.data.datautils.createIncomeTransaction
 import com.fwrdgrp.financetracker.data.datautils.plus
 import com.fwrdgrp.financetracker.data.datautils.updateUserMetricsAndBudget
 import com.fwrdgrp.financetracker.data.enum.DateFilter
@@ -291,5 +292,12 @@ class RepoImpl @Inject constructor(
                 "budget.refresh" to newTimestamp
             )
         ).await()
+    }
+
+    override suspend fun incomeRollover(newTimestamp: Timestamp) {
+        val user = requireUser()
+
+        addTransaction(createIncomeTransaction(user))
+        userDoc().update(mapOf("monthlyIncome.payday" to newTimestamp))
     }
 }

@@ -2,10 +2,14 @@ package com.fwrdgrp.financetracker.data.datautils
 
 import com.fwrdgrp.financetracker.data.enum.Category
 import com.fwrdgrp.financetracker.data.enum.DateFilter
+import com.fwrdgrp.financetracker.data.enum.PaymentMethod
 import com.fwrdgrp.financetracker.data.enum.TransactionType
 import com.fwrdgrp.financetracker.data.model.main.Budget
 import com.fwrdgrp.financetracker.data.model.main.DerivedDate
+import com.fwrdgrp.financetracker.data.model.main.User
+import com.fwrdgrp.financetracker.data.model.request.TransactionReq
 import com.fwrdgrp.financetracker.ui.uiutils.toCalendar
+import com.fwrdgrp.financetracker.ui.uiutils.toTimestamp
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import kotlinx.coroutines.tasks.await
@@ -56,7 +60,10 @@ fun calculateStatsDateRange(
     return start.timeInMillis to end
 }
 
-private fun isWithinCurrentBudgetPeriod(transactionTimestamp: Timestamp, refreshDate: Int): Boolean {
+private fun isWithinCurrentBudgetPeriod(
+    transactionTimestamp: Timestamp,
+    refreshDate: Int
+): Boolean {
     val transactionCalendar = transactionTimestamp.toCalendar()
     val now = Calendar.getInstance()
 
@@ -249,5 +256,23 @@ suspend fun DocumentReference.updateUserMetricsAndBudget(
     updateMap.putAll(budgetUpdates)
 
     this.update(updateMap).await()
+}
+
+fun createIncomeTransaction(user: User): TransactionReq {
+    val calendar = Calendar.getInstance()
+    val derivedDate = deriveDateFields(calendar.timeInMillis)
+    return TransactionReq(
+        type = TransactionType.Income,
+        method = PaymentMethod.FPX,
+        category = Category.Other,
+        customCategory = "Salary",
+        amount = user.monthlyIncome.amount,
+        note = "Monthly Income",
+        timestamp = calendar.toTimestamp(),
+        year = derivedDate.year,
+        week = derivedDate.week,
+        month = derivedDate.month,
+        day = derivedDate.day
+    )
 }
 
