@@ -155,6 +155,6 @@ fun Nav(modifier: Modifier = Modifier, navController: NavHostController) {
         composable<Screen.Profile> { ProfileScreen() }
         composable<Screen.Breakdown> { BreakdownScreen() }
         composable<Screen.Bills> { BillsScreen(navController) }
-        composable<Screen.BillDetails>{ BillDetailScreen() }
+        composable<Screen.BillDetails>{ BillDetailScreen(navController) }
     }
 }

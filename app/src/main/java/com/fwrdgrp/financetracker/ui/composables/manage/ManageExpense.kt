@@ -67,7 +67,10 @@ fun ManageExpense(
     val tabs = Category.entries
 
     var timestampCalendar by remember(form.timestamp) {
-        mutableStateOf(form.timestamp?.toCalendar())
+        mutableStateOf(
+            if (isEditing) form.newTimestamp?.toCalendar()
+            else form.timestamp?.toCalendar()
+        )
     }
 
     if (showDialog) {
@@ -141,7 +144,7 @@ fun ManageExpense(
             if (
                 if (isEditing) form.newCategory == Category.Other
                 else form.category == Category.Other
-                ) {
+            ) {
                 Spacer(Modifier.height(16.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),

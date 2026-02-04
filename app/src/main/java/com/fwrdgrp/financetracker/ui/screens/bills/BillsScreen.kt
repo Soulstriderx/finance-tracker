@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,19 @@ fun BillsScreen(
     var showDialog by remember { mutableStateOf(false) }
     var showDateDialog by remember { mutableStateOf(false) }
     val bills by viewModel.bills.collectAsStateWithLifecycle()
+
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntry?.savedStateHandle?.getStateFlow(
+            "bills_updated",
+            false
+        )?.collect { updated ->
+            if (updated) {
+                viewModel.fetchBills()
+                navController.currentBackStackEntry?.savedStateHandle
+                    ?.set("bills_updated", false)
+            }
+        }
+    }
 
     if (showDialog) {
         ManageBillDialog(
