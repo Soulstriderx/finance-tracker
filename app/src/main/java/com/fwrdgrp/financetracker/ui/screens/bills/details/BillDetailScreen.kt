@@ -127,14 +127,15 @@ fun BillDetailScreen(
                 }
                 item {
                     if (bill.paymentHistory.isNotEmpty()) {
-                        bill.paymentHistory.forEach { item ->
+                        var selectedPayment by remember { mutableStateOf<String>("") }
                         DeleteDialog(
                             showDialog = showRecordDelete,
                             title = "Deleting a Payment Record",
                             { showRecordDelete = it }) {
-                            viewModel.deletePayment(bill, item.uid)
+                            viewModel.deletePayment(bill, selectedPayment)
                             showRecordDelete = false
                         }
+                        bill.paymentHistory.forEach { item ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -143,7 +144,10 @@ fun BillDetailScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(item.monthYear, Modifier.weight(1f))
-                                IconButton(onClick = { showRecordDelete = true }) {
+                                IconButton(onClick = {
+                                    selectedPayment = item.uid
+                                    showRecordDelete = true
+                                }) {
                                     Icon(Icons.Default.Delete, null)
                                 }
                             }
