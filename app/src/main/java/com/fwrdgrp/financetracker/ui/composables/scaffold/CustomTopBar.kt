@@ -27,6 +27,7 @@ import com.fwrdgrp.financetracker.ui.navigation.Screen
 @Composable
 fun CustomTopBar(
     navController: NavController,
+    modifier: Modifier = Modifier,
     label: String = "",
     showBackButton: Boolean,
     showLogout: Boolean,
@@ -34,7 +35,7 @@ fun CustomTopBar(
 ) {
     val size = 28.dp
     Box(
-        contentAlignment = Alignment.Center, modifier = Modifier
+        contentAlignment = Alignment.Center, modifier = modifier
             .fillMaxWidth()
             .padding(
                 vertical = 10.dp, horizontal = 16.dp

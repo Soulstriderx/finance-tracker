@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +42,8 @@ import com.fwrdgrp.financetracker.data.model.main.Transaction
 import com.fwrdgrp.financetracker.ui.composables.general.Chip
 import com.fwrdgrp.financetracker.ui.composables.input.DeleteDialog
 import com.fwrdgrp.financetracker.ui.navigation.Screen
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
+import com.fwrdgrp.financetracker.ui.theme.Terracotta
 import com.fwrdgrp.financetracker.ui.uiutils.withCommas
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -201,7 +204,11 @@ fun TransactionDetails(
                 Button(
                     onClick = { showDelete = true },
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Terracotta,
+                        contentColor = OffWhite
+                    )
                 ) {
                     Text(
                         "Delete",

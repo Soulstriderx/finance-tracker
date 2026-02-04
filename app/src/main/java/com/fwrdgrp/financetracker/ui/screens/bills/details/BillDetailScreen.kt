@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +37,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.fwrdgrp.financetracker.ui.composables.input.DeleteDialog
 import com.fwrdgrp.financetracker.ui.composables.manage.ManageBillDialog
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
+import com.fwrdgrp.financetracker.ui.theme.Terracotta
 import com.fwrdgrp.financetracker.ui.uiutils.createBillReqWithBill
 import com.fwrdgrp.financetracker.ui.uiutils.getTimeLeft
 
@@ -200,7 +203,11 @@ fun BillDetailScreen(
                 Button(
                     onClick = { showDelete = true },
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Terracotta,
+                        contentColor = OffWhite
+                    )
                 ) {
                     Text("Delete")
                 }

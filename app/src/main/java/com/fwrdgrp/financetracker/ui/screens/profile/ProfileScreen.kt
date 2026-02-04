@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.fwrdgrp.financetracker.data.datautils.deriveDateFields
 import com.fwrdgrp.financetracker.data.model.main.Bill
 import com.fwrdgrp.financetracker.data.model.main.Transaction
@@ -156,10 +155,12 @@ fun Profile(
                             "Monthly Bills",
                             "$${calculateMonthlyBillsTotal(bills)}"
                         )
-                        Text(
-                            "Payday in ${getTimeLeft(user.monthlyIncome.payday)}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        if (user.monthlyIncome.payday != null) {
+                            Text(
+                                "Payday in ${getTimeLeft(user.monthlyIncome.payday)}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
                 Spacer(Modifier.height(0.dp))
@@ -309,10 +310,12 @@ fun Profile(
                             }
                         }
                     } else {
-                        Text(
-                            "Refresh in ${getTimeLeft(user.budget.refresh)}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        if (total.toDouble() != 0.0) {
+                            Text(
+                                "Refresh in ${getTimeLeft(user.budget.refresh)}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
                 Spacer(Modifier.height(0.dp))

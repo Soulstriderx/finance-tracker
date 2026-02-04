@@ -20,8 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.fwrdgrp.financetracker.ui.theme.CreamyTan
 
 @Composable
 fun RoundedColumn(
@@ -38,7 +38,7 @@ fun RoundedColumn(
             .fillMaxWidth()
             .shadow(6.dp, RoundedCornerShape(8.dp))
             .background(
-                color = Color.White,
+                color = CreamyTan,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(vertical = 16.dp),

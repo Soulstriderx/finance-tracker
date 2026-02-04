@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,8 +52,8 @@ fun <T> CustomDropdown(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = if (items.isNotEmpty()) Color.Black else Color.Gray,
                 unfocusedTextColor = if (items.isNotEmpty()) Color.Black else Color.Gray,
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+                focusedContainerColor = OffWhite,
+                unfocusedContainerColor = OffWhite
             ),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier

@@ -2,6 +2,7 @@ package com.fwrdgrp.financetracker.ui.screens.auth.login
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import com.fwrdgrp.financetracker.R
 import com.fwrdgrp.financetracker.data.model.request.LoginReq
 import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.navigation.Screen
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
 import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
@@ -97,7 +99,9 @@ fun Login(
                     painter = painterResource(id = R.drawable.finance_logo),
                     contentDescription = "Description of image",
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxWidth().height(200.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
                 )
                 Text(
                     "Login", fontSize = 24.sp,
@@ -108,11 +112,24 @@ fun Login(
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(24.dp))
-                CustomTextField("Email", form.email)
+                CustomTextField(
+                    "Email",
+                    form.email,
+                    modifier = Modifier.background(
+                        color = OffWhite,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                )
                 { onFormChange(form.copy(email = it)) }
                 Spacer(Modifier.height(16.dp))
-                CustomTextField("Password", form.password, isPassword = true)
-                    { onFormChange(form.copy(password = it)) }
+                CustomTextField(
+                    "Password", form.password, isPassword = true,
+                    modifier = Modifier.background(
+                        color = OffWhite,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                )
+                { onFormChange(form.copy(password = it)) }
                 Spacer(Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),

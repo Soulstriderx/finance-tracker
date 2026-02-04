@@ -1,5 +1,6 @@
 package com.fwrdgrp.financetracker.ui.composables.manage
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -22,6 +24,8 @@ import com.fwrdgrp.financetracker.data.model.request.BillReq
 import com.fwrdgrp.financetracker.ui.composables.general.MediumTitleText
 import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
+import com.fwrdgrp.financetracker.ui.theme.MutedBrown
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
 import com.fwrdgrp.financetracker.ui.uiutils.toCalendar
 import com.fwrdgrp.financetracker.ui.uiutils.toRegisterString
 import com.google.firebase.Timestamp
@@ -38,8 +42,10 @@ fun ManageBillDialog(
 ) {
     var form by remember { mutableStateOf(form) }
     var timestampCalendar by remember(form.nextDue) {
-        mutableStateOf(if (isEdit) form.newNextDue?.toCalendar() else
-            form.nextDue?.toCalendar())
+        mutableStateOf(
+            if (isEdit) form.newNextDue?.toCalendar() else
+                form.nextDue?.toCalendar()
+        )
     }
 
     if (showDateDialog) {
@@ -64,11 +70,23 @@ fun ManageBillDialog(
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 MediumTitleText("Name")
-                CustomTextField("Name", if (isEdit) form.newName else form.name)
+                CustomTextField(
+                    "Name", if (isEdit) form.newName else form.name,
+                    modifier = Modifier.background(
+                        color = OffWhite,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                )
                 { form = if (isEdit) form.copy(newName = it) else form.copy(name = it) }
                 Spacer(Modifier.height(8.dp))
                 MediumTitleText("Amount")
-                CustomTextField("Amount", if (isEdit) form.newAmount else form.amount)
+                CustomTextField(
+                    "Amount", if (isEdit) form.newAmount else form.amount,
+                    modifier = Modifier.background(
+                        color = OffWhite,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                )
                 { form = if (isEdit) form.copy(newAmount = it) else form.copy(amount = it) }
                 Spacer(Modifier.height(8.dp))
                 MediumTitleText("Recurring Day")
@@ -105,7 +123,11 @@ fun ManageBillDialog(
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
                     onDismiss()
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MutedBrown,
+                    contentColor = OffWhite
+                )
             ) {
                 Text("Cancel")
             }

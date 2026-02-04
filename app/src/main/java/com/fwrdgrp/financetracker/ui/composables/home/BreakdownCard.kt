@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,6 +22,8 @@ import com.fwrdgrp.financetracker.data.enum.DateFilter
 import com.fwrdgrp.financetracker.data.model.ui.PieChartData
 import com.fwrdgrp.financetracker.ui.composables.charts.PieChart
 import com.fwrdgrp.financetracker.ui.composables.general.TabButtons
+import com.fwrdgrp.financetracker.ui.theme.AlmostBlack
+import com.fwrdgrp.financetracker.ui.theme.CreamyTan
 
 @Composable
 fun BreakdownCard(
@@ -36,7 +37,7 @@ fun BreakdownCard(
             .fillMaxWidth()
             .shadow(6.dp, RoundedCornerShape(8.dp))
             .background(
-                color = Color.White,
+                color = CreamyTan,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(vertical = 12.dp),
@@ -50,14 +51,16 @@ fun BreakdownCard(
                 fontSize = 18.sp,
             )
             Spacer(Modifier.height(8.dp))
-            HorizontalDivider(thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp, color = AlmostBlack)
             TabButtons(tabs, selectedTab, { it.name })
             { onTabSelect(it) }
-            HorizontalDivider(thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp, color = AlmostBlack)
             if (pieData.isNotEmpty()) {
                 PieChart(
                     data = pieData,
-                    modifier = Modifier.fillMaxWidth().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 )
             } else {
                 Spacer(Modifier.height(24.dp))

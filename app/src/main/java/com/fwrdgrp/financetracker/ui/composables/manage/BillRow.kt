@@ -17,11 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fwrdgrp.financetracker.data.model.main.Bill
+import com.fwrdgrp.financetracker.ui.theme.CreamyTan
 import com.fwrdgrp.financetracker.ui.uiutils.getTimeLeft
 import com.fwrdgrp.financetracker.ui.uiutils.withCommas
 
@@ -32,7 +32,7 @@ fun BillRow(item: Bill, payBill: (Bill) -> Unit, navToDetails: (String) -> Unit)
             .fillMaxWidth()
             .shadow(6.dp, RoundedCornerShape(8.dp))
             .background(
-                color = Color.White,
+                color = CreamyTan,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(vertical = 16.dp)

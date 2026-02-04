@@ -2,6 +2,7 @@ package com.fwrdgrp.financetracker.ui.composables.input
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.fwrdgrp.financetracker.ui.theme.OffWhite
 import java.util.Calendar
 
 @SuppressLint("RememberInComposition")
@@ -33,7 +35,9 @@ fun DatePicker(
         onValueChange = {},
         readOnly = true,
         shape = RoundedCornerShape(12.dp),
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .background(color = OffWhite, shape = RoundedCornerShape(12.dp))
+            .fillMaxWidth(),
         placeholder = { Text("Select Day") },
         trailingIcon = {
             Icon(
