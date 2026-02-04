@@ -54,10 +54,7 @@ fun AddCustomCategoryDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (text.isNotBlank()) {
-                        onSubmit(text.trim().replaceFirstChar { it.uppercase() })
-                        onDismiss()
-                    }
+                    onSubmit(text.trim().replaceFirstChar { it.uppercase() })
                 }
             ) {
                 Text("Add")

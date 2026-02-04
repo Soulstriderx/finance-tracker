@@ -95,7 +95,6 @@ fun ManageBillDialog(
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
                     onConfirm(form)
-                    onDismiss()
                 }
             ) {
                 Text(if (isEdit) "Update" else "Add")
@@ -112,5 +111,4 @@ fun ManageBillDialog(
             }
         }
     )
-
 }

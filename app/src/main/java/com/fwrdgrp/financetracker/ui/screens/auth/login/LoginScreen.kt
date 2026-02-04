@@ -1,5 +1,6 @@
 package com.fwrdgrp.financetracker.ui.screens.auth.login
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,6 +59,12 @@ fun LoginScreen(
             navController.navigate(Screen.Home) {
                 popUpTo<Screen.Login> { inclusive = true }
             }
+        }
+    }
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.toast.collect { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
 

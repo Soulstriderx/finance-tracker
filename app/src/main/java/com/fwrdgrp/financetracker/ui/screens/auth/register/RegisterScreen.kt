@@ -46,7 +46,6 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
 
     var form by remember { mutableStateOf(RegisterReq()) }
     var income by remember { mutableStateOf(MonthlyIncome()) }
@@ -60,6 +59,7 @@ fun RegisterScreen(
             navController.popBackStack()
         }
     }
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.toast.collect { msg ->
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()

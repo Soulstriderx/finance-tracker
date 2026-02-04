@@ -3,8 +3,11 @@ package com.fwrdgrp.financetracker.ui.screens.base
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fwrdgrp.financetracker.data.enum.Category
+import com.fwrdgrp.financetracker.data.model.request.BillReq
 import com.fwrdgrp.financetracker.data.model.request.LoginReq
 import com.fwrdgrp.financetracker.data.model.request.RegisterReq
+import com.fwrdgrp.financetracker.data.model.request.TransactionReq
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +21,7 @@ import java.lang.Exception
 open class BaseViewModel : ViewModel() {
     protected val _showIncomePrompt = MutableStateFlow(false)
     val showIncomePrompt = _showIncomePrompt.asStateFlow()
-    protected val _toast = MutableSharedFlow<String>()
+    protected val _toast = MutableSharedFlow<String>(replay = 1)
     val toast = _toast.asSharedFlow()
 
     suspend fun <T> safeApiCall(func: suspend () -> T?): T? {
@@ -81,6 +84,71 @@ open class BaseViewModel : ViewModel() {
 
         if (pass != pass2) {
             emitToast("Passwords do not match")
+            return false
+        }
+        return true
+    }
+
+    fun validateTransaction(form: TransactionReq, isEditing: Boolean): Boolean {
+        val amount = if (isEditing) form.newAmount else form.amount
+        val timestamp = if (isEditing) form.newTimestamp else form.timestamp
+        val category = if (isEditing) form.newCategory else form.category
+
+        if (amount.isBlank()) {
+            emitToast("Amount cannot be empty")
+            return false
+        }
+
+        val amountValue = amount.toDoubleOrNull()
+        if (amountValue == null || amountValue <= 0.0) {
+            emitToast("Please enter a valid amount greater than 0")
+            return false
+        }
+
+        if (timestamp == null) {
+            emitToast("Please select a date")
+            return false
+        }
+
+        if (category == Category.Other && form.customCategory.isNullOrBlank()) {
+            emitToast("Please select a custom category")
+            return false
+        }
+
+        return true
+    }
+
+    fun validateBill(form: BillReq, isEdit: Boolean): Boolean {
+        val name = if (isEdit) form.newName else form.name
+        val amount = if (isEdit) form.newAmount else form.amount
+        val nextDue = if (isEdit) form.newNextDue else form.nextDue
+
+        if (name.isBlank()) {
+            emitToast("Bill name cannot be empty")
+            return false
+        }
+
+        if (amount.isBlank()) {
+            emitToast("Amount cannot be empty")
+            return false
+        }
+
+        val amountValue = amount.toDoubleOrNull()
+        if (amountValue == null || amountValue <= 0.0) {
+            emitToast("Please enter a valid amount greater than 0")
+            return false
+        }
+
+        if (nextDue == null) {
+            emitToast("Please select a recurring date")
+            return false
+        }
+        return true
+    }
+
+    fun validateCustomCat(category: String): Boolean {
+        if (category.isBlank()) {
+            emitToast("Category name cannot be empty")
             return false
         }
         return true

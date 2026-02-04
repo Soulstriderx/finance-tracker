@@ -72,6 +72,7 @@ class EditTransactionViewModel @Inject constructor(
     fun updateTransaction(transactionReq: TransactionReq) {
         viewModelScope.launch {
             safeApiCall {
+                validateTransaction(transactionReq, true)
                 repo.editTransaction(transactionReq).let {
                     _finish.emit(Unit)
                 }

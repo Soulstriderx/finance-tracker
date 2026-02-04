@@ -1,5 +1,6 @@
 package com.fwrdgrp.financetracker.ui.screens.bills.details
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -50,6 +52,12 @@ fun BillDetailScreen(
             navController.popBackStack()
         }
     }
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.toast.collect { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     var showDialog by remember { mutableStateOf(false) }
     var showDelete by remember { mutableStateOf(false) }
@@ -65,7 +73,12 @@ fun BillDetailScreen(
                 form = createBillReqWithBill(bill),
                 showDateDialog = showDateDialog,
                 onDateDialogChange = { showDateDialog = it },
-                onDismiss = { showDialog = false }) { viewModel.editBill(it) }
+                onDismiss = { showDialog = false }) {
+                if (viewModel.validateBill(it, true)) {
+                    viewModel.editBill(it)
+                    showDialog = false
+                }
+            }
         }
 
         DeleteDialog(

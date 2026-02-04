@@ -54,6 +54,7 @@ class BillDetailViewModel @Inject constructor(
     fun editBill(bill: BillReq) {
         viewModelScope.launch {
             safeApiCall {
+                validateBill(bill, true)
                 repo.editBill(bill).let {
                     fetchBillById()
                 }
