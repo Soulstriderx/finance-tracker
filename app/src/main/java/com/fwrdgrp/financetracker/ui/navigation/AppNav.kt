@@ -27,6 +27,7 @@ import com.fwrdgrp.financetracker.ui.composables.scaffold.CustomTopBar
 import com.fwrdgrp.financetracker.ui.navigation.auth.AuthViewModel
 import com.fwrdgrp.financetracker.ui.screens.auth.login.LoginScreen
 import com.fwrdgrp.financetracker.ui.screens.auth.register.RegisterScreen
+import com.fwrdgrp.financetracker.ui.screens.breakdown.BreakdownScreen
 import com.fwrdgrp.financetracker.ui.screens.home.HomeScreen
 import com.fwrdgrp.financetracker.ui.screens.manage.add.AddTransactionScreen
 import com.fwrdgrp.financetracker.ui.screens.manage.edit.EditTransactionScreen
@@ -50,6 +51,7 @@ fun AppNav(
         curDest.hasRoute<Screen.Edit>() ||
         curDest.hasRoute<Screen.TranDetails>() ||
         curDest.hasRoute<Screen.Login>() ||
+        curDest.hasRoute<Screen.Breakdown>() ||
         curDest.hasRoute<Screen.Register>() -> false
         else -> true
     }
@@ -87,6 +89,7 @@ fun AppNav(
         curDest.hasRoute<Screen.Stats>() -> "Stats"
         curDest.hasRoute<Screen.TranDetails>() -> "Transaction Details"
         curDest.hasRoute<Screen.Profile>() -> "Profile"
+        curDest.hasRoute<Screen.Breakdown>() -> "Transaction Breakdown"
         else -> ""
     }
 
@@ -144,5 +147,6 @@ fun Nav(modifier: Modifier = Modifier, navController: NavHostController) {
         composable<Screen.TranDetails> { TransactionDetailsScreen(navController) }
         composable<Screen.Stats> { StatsScreen(navController) }
         composable<Screen.Profile> { ProfileScreen(navController) }
+        composable<Screen.Breakdown> { BreakdownScreen() }
     }
 }

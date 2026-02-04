@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +33,7 @@ import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
 import com.fwrdgrp.financetracker.ui.navigation.Screen
 import com.fwrdgrp.financetracker.ui.uiutils.toFullTextDate
 import com.fwrdgrp.financetracker.ui.uiutils.toMonthRangeText
+import com.fwrdgrp.financetracker.ui.uiutils.toRange
 import com.fwrdgrp.financetracker.ui.uiutils.toWeekRangeText
 import java.util.Calendar
 
@@ -52,7 +55,7 @@ fun TransactionScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Spacer(Modifier.height(0.dp))
                 SelectionButtons(
@@ -69,6 +72,18 @@ fun TransactionScreen(
                         viewModel.onDateFilterSelect(selectedTab, it)
                     }
                 )
+                if (selectedTab == DateFilter.Weekly || selectedTab == DateFilter.Monthly) {
+                    Button(
+                        onClick = {
+                            val (start, end) = toRange(selectedTab)
+                            navController.navigate(Screen.Breakdown(start, end))
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("View Breakdown")
+                    }
+                }
                 Spacer(Modifier.height(0.dp))
             }
             HorizontalDivider(thickness = 1.dp, color = Color.Black)

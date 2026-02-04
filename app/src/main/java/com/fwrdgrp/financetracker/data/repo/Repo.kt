@@ -30,12 +30,13 @@ interface Repo {
     suspend fun deleteCustomCategory(customCat: String)
     suspend fun fetchMyTransactions(): Flow<List<Transaction>>
     suspend fun fetchTransactionById(uid: String): Transaction
-
     suspend fun fetchTransactionsByDate(
         filter: DateFilter,
         referenceDate: Calendar,
         isStats: Boolean
     ): Flow<List<Transaction>>
+
+    suspend fun fetchTransactionsByRange(start: Long, end: Long): List<Transaction>
 
     suspend fun budgetRollover(newTimestamp: Timestamp)
 }
