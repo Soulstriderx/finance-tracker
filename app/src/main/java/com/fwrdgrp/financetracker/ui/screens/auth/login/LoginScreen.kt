@@ -1,5 +1,6 @@
 package com.fwrdgrp.financetracker.ui.screens.auth.login
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,12 +23,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.fwrdgrp.financetracker.R
 import com.fwrdgrp.financetracker.data.model.request.LoginReq
 import com.fwrdgrp.financetracker.ui.composables.input.CustomTextField
 import com.fwrdgrp.financetracker.ui.navigation.Screen
@@ -75,13 +79,18 @@ fun Login(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-//            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) /*For Logo*/
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.finance_logo),
+                    contentDescription = "Description of image",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxWidth().height(200.dp)
+                )
                 Text(
                     "Login", fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
@@ -118,6 +127,7 @@ fun Login(
                         )
                     }
                 }
+                Spacer(Modifier.height(100.dp))
             }
         }
         Button(
