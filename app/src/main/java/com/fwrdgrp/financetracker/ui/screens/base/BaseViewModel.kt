@@ -7,12 +7,17 @@ import com.fwrdgrp.financetracker.data.model.request.LoginReq
 import com.fwrdgrp.financetracker.data.model.request.RegisterReq
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 open class BaseViewModel : ViewModel() {
+    protected val _showIncomePrompt = MutableStateFlow(false)
+    val showIncomePrompt = _showIncomePrompt.asStateFlow()
     protected val _toast = MutableSharedFlow<String>()
     val toast = _toast.asSharedFlow()
 
@@ -25,6 +30,14 @@ open class BaseViewModel : ViewModel() {
         } catch (e: Exception) {
             null
         }
+    }
+
+    fun dismissPrompt() {
+        _showIncomePrompt.update { false }
+    }
+
+    fun showPrompt() {
+        _showIncomePrompt.update { true }
     }
 
     fun validateLogin(form: LoginReq): Boolean {

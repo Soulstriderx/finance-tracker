@@ -11,7 +11,7 @@ data class MonthlyIncome(
         fun fromMap(map: Map<String, Any>): MonthlyIncome {
             return MonthlyIncome(
                 amount = map["amount"] as? String ?: "",
-                day = (map["day"] as? Int) ?: 0,
+                day = (map["day"] as? Number)?.toInt() ?: 0,
                 payday = map["payday"] as? Timestamp
             )
         }

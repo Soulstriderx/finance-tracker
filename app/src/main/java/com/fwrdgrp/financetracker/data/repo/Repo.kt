@@ -39,4 +39,5 @@ interface Repo {
     suspend fun fetchTransactionsByRange(start: Long, end: Long): List<Transaction>
 
     suspend fun budgetRollover(newTimestamp: Timestamp)
+    suspend fun incomeRollover(newTimestamp: Timestamp)
 }
