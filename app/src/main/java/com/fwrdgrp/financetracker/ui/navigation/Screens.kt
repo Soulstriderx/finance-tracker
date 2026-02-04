@@ -23,5 +23,9 @@ sealed class Screen {
     @Serializable
     object Profile : Screen()
     @Serializable
-    data class Breakdown(val start: Long, val end: Long): Screen()
+    data class Breakdown(val start: Long, val end: Long) : Screen()
+    @Serializable
+    object Bills : Screen()
+    @Serializable
+    data class BillDetails(val uid: String) : Screen()
 }

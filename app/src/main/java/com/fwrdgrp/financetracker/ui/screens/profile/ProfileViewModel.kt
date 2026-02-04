@@ -2,6 +2,7 @@ package com.fwrdgrp.financetracker.ui.screens.profile
 
 import androidx.lifecycle.viewModelScope
 import com.fwrdgrp.financetracker.data.enum.DateFilter
+import com.fwrdgrp.financetracker.data.model.main.Bill
 import com.fwrdgrp.financetracker.data.model.main.Transaction
 import com.fwrdgrp.financetracker.data.model.main.User
 import com.fwrdgrp.financetracker.data.model.request.ProfileUpdateReq
@@ -14,6 +15,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -27,12 +29,15 @@ class ProfileViewModel @Inject constructor(
     private val _user = MutableStateFlow<User?>(null)
     val user = _user.asStateFlow()
 
+    private val _bills = MutableStateFlow<List<Bill>>(emptyList())
+    val bills = _bills.asStateFlow()
     private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
     val transaction = _transactions.asStateFlow()
 
     init {
         fetchUser()
         fetchTransactions()
+        fetchBills()
     }
 
     fun fetchUser() {
@@ -41,6 +46,16 @@ class ProfileViewModel @Inject constructor(
         userJob = viewModelScope.launch {
             firebaseAuthService.user.collectLatest {
                 _user.value = it
+            }
+        }
+    }
+
+    fun fetchBills() {
+        viewModelScope.launch {
+            safeApiCall {
+                repo.fetchBills().let { bills ->
+                    _bills.update { bills }
+                }
             }
         }
     }
