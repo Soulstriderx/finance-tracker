@@ -127,7 +127,7 @@ fun BillDetailScreen(
                 }
                 item {
                     if (bill.paymentHistory.isNotEmpty()) {
-                        var selectedPayment by remember { mutableStateOf<String>("") }
+                        var selectedPayment by remember { mutableStateOf("") }
                         DeleteDialog(
                             showDialog = showRecordDelete,
                             title = "Deleting a Payment Record",
