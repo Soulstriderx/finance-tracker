@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -25,8 +24,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.fwrdgrp.financetracker.ui.composables.scaffold.AddExpenseFab
 import com.fwrdgrp.financetracker.ui.composables.scaffold.BottomNavBar
-import com.fwrdgrp.financetracker.ui.composables.scaffold.CustomTopBar
-import com.fwrdgrp.financetracker.ui.navigation.auth.AuthViewModel
+import com.fwrdgrp.financetracker.ui.composables.scaffold.topbar.CustomTopBar
 import com.fwrdgrp.financetracker.ui.screens.auth.login.LoginScreen
 import com.fwrdgrp.financetracker.ui.screens.auth.register.RegisterScreen
 import com.fwrdgrp.financetracker.ui.screens.bills.BillsScreen
@@ -39,14 +37,12 @@ import com.fwrdgrp.financetracker.ui.screens.profile.ProfileScreen
 import com.fwrdgrp.financetracker.ui.screens.stats.StatsScreen
 import com.fwrdgrp.financetracker.ui.screens.transaction.TransactionScreen
 import com.fwrdgrp.financetracker.ui.screens.transactiondetails.TransactionDetailsScreen
-import com.fwrdgrp.financetracker.ui.theme.CreamyTan
 import com.fwrdgrp.financetracker.ui.theme.Jeremy
 
 @Composable
 fun AppNav(
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: AuthViewModel = hiltViewModel()
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val curDest = navBackStackEntry?.destination
@@ -148,7 +144,6 @@ fun AppNav(
                         label = label,
                         showBackButton = showBackBtn,
                         showLogout = showLogout,
-                        authService = viewModel.authService
                     )
                 }
                 Nav(modifier, navController)

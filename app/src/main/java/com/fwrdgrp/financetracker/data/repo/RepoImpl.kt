@@ -24,6 +24,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import jakarta.inject.Inject
@@ -39,6 +40,8 @@ class RepoImpl @Inject constructor(
     firestore: FirebaseFirestore
 ) : Repo {
     private val dbRef = firestore.collection("users")
+
+    private val activeListeners = mutableListOf<ListenerRegistration>()
 
     private fun requireUser(): User {
         return authService.getCurrentUser() ?: throw IllegalStateException("User not logged in")
@@ -230,6 +233,7 @@ class RepoImpl @Inject constructor(
 
                 trySend(transactions)
             }
+        activeListeners.add(snapshot)
 
         awaitClose { snapshot.remove() }
     }
@@ -271,6 +275,7 @@ class RepoImpl @Inject constructor(
                 } ?: emptyList()
                 trySend(transactions)
             }
+        activeListeners.add(snapshot)
         awaitClose { snapshot.remove() }
     }
 
@@ -375,5 +380,10 @@ class RepoImpl @Inject constructor(
         val updatedHistory = bill.paymentHistory.filter { it.uid != paymentUid }
         userDoc().collection("bills").document(bill.uid)
             .update("paymentHistory", updatedHistory.map { it.toMap() }).await()
+    }
+
+    override fun removeAllListeners() {
+        activeListeners.forEach { it.remove() }
+        activeListeners.clear()
     }
 }
