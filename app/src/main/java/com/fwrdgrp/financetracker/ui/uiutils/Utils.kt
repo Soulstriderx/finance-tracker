@@ -282,10 +282,11 @@ fun calculateChartData(
     transactions: List<Transaction>,
     referenceCalendar: Calendar = Calendar.getInstance()
 ): BarChartData {
+    val expenses = transactions.filter { it.type == TransactionType.Expense }
     val data = when (selectedTab) {
-        DateFilter.Daily -> aggregateDailyTransactions(transactions, referenceCalendar)
-        DateFilter.Weekly -> aggregateWeeklyTransactions(transactions, referenceCalendar)
-        DateFilter.Monthly -> aggregateMonthlyTransactions(transactions, referenceCalendar)
+        DateFilter.Daily -> aggregateDailyTransactions(expenses, referenceCalendar)
+        DateFilter.Weekly -> aggregateWeeklyTransactions(expenses, referenceCalendar)
+        DateFilter.Monthly -> aggregateMonthlyTransactions(expenses, referenceCalendar)
     }
 
     val maxSpend = data.maxOfOrNull { it.spend } ?: 0f
@@ -443,8 +444,18 @@ fun shouldRollover(budget: Budget): Boolean {
     return hasRefreshDatePassed
 }
 
+fun shouldRollover(monthlyIncome: MonthlyIncome): Boolean {
+    val currentRefreshCalendar = monthlyIncome.payday?.toCalendar() ?: return false
+    val today = Calendar.getInstance()
+    val hasRefreshDatePassed = currentRefreshCalendar.timeInMillis <= today.timeInMillis
+
+    return hasRefreshDatePassed
+}
+
 fun calculateNextRefreshTimestamp(originalRefreshDay: Int): Timestamp {
     val nextRefreshCalendar = Calendar.getInstance().apply {
+        set(Calendar.DAY_OF_MONTH, 1)
+
         add(Calendar.MONTH, 1)
 
         val maxDayInNextMonth = getActualMaximum(Calendar.DAY_OF_MONTH)

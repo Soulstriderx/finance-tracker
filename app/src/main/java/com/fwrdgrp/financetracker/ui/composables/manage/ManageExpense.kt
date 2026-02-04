@@ -138,7 +138,10 @@ fun ManageExpense(
                 }
             }
 
-            if (form.category == Category.Other) {
+            if (
+                if (isEditing) form.newCategory == Category.Other
+                else form.category == Category.Other
+                ) {
                 Spacer(Modifier.height(16.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),

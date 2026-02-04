@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fwrdgrp.financetracker.data.enum.Category
+import com.fwrdgrp.financetracker.data.enum.TransactionType
 import com.fwrdgrp.financetracker.ui.composables.general.LargeTitleText
 import com.fwrdgrp.financetracker.ui.composables.general.RoundedColumn
 import com.fwrdgrp.financetracker.ui.composables.general.TextValueRow
@@ -38,7 +39,10 @@ fun BreakdownScreen(
 ) {
     val transactions by viewModel.transactions.collectAsStateWithLifecycle()
     val dateRange by viewModel.dateRange.collectAsStateWithLifecycle()
-    val sum = transactions.sumOf { it.amount.toDouble() }
+    val sumIncome =
+        transactions.sumOf { if (it.type == TransactionType.Income) it.amount.toDouble() else 0.0 }
+    val sumExpense =
+        transactions.sumOf { if (it.type == TransactionType.Expense) it.amount.toDouble() else 0.0 }
     val foodSum = transactions.sumOf {
         if (it.category == Category.Food) it.amount.toDoubleOrNull() ?: 0.0 else 0.0
     }
@@ -52,13 +56,16 @@ fun BreakdownScreen(
         if (it.category == Category.Household) it.amount.toDoubleOrNull() ?: 0.0 else 0.0
     }
     val otherSum = transactions.sumOf {
-        if (it.category == Category.Other) it.amount.toDoubleOrNull() ?: 0.0 else 0.0
+        if (it.category == Category.Other && it.type == TransactionType.Expense) {
+            it.amount.toDoubleOrNull()
+                ?: 0.0
+        } else 0.0
     }
 
     var showOther by remember { mutableStateOf(false) }
     val otherGrouped: Map<String, Double> =
         transactions
-            .filter { it.category == Category.Other }
+            .filter { it.category == Category.Other && it.type == TransactionType.Expense }
             .groupBy { it.customCategory ?: "Other" }
             .mapValues { (_, items) ->
                 items.sumOf { it.amount.toDoubleOrNull() ?: 0.0 }
@@ -77,11 +84,20 @@ fun BreakdownScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 LargeTitleText(dateRange)
-                TextValueRow(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    label = "Total Spend : ",
-                    value = "$${sum.withCommas()}"
-                )
+                if (sumIncome != 0.0) {
+                    TextValueRow(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        label = "Total Income : ",
+                        value = "$${sumIncome.withCommas()}"
+                    )
+                }
+                if (sumExpense != 0.0) {
+                    TextValueRow(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        label = "Total Spend : ",
+                        value = "$${sumExpense.withCommas()}"
+                    )
+                }
                 HorizontalDivider(thickness = 1.dp)
                 if (foodSum != 0.0) {
                     Row(
