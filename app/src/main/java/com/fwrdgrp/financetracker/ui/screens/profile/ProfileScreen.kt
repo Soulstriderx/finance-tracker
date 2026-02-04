@@ -26,6 +26,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.fwrdgrp.financetracker.data.datautils.deriveDateFields
+import com.fwrdgrp.financetracker.data.model.main.Bill
 import com.fwrdgrp.financetracker.data.model.main.Transaction
 import com.fwrdgrp.financetracker.data.model.main.User
 import com.fwrdgrp.financetracker.data.model.request.ProfileUpdateReq
@@ -34,6 +35,7 @@ import com.fwrdgrp.financetracker.ui.composables.general.TextValueRow
 import com.fwrdgrp.financetracker.ui.composables.input.DatePicker
 import com.fwrdgrp.financetracker.ui.uiutils.calcOverbudget
 import com.fwrdgrp.financetracker.ui.uiutils.calculateAverages
+import com.fwrdgrp.financetracker.ui.uiutils.calculateMonthlyBillsTotal
 import com.fwrdgrp.financetracker.ui.uiutils.calculateTotalBudget
 import com.fwrdgrp.financetracker.ui.uiutils.createProfileForm
 import com.fwrdgrp.financetracker.ui.uiutils.getTimeLeft
@@ -45,20 +47,21 @@ import java.util.Calendar
 
 @Composable
 fun ProfileScreen(
-    navController: NavController,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
     val transactions by viewModel.transaction.collectAsStateWithLifecycle()
+    val bills by viewModel.bills.collectAsStateWithLifecycle()
 
     user?.let { user ->
-        Profile(user, transactions) { viewModel.updateProfile(it) }
+        Profile(user, bills, transactions) { viewModel.updateProfile(it) }
     }
 }
 
 @Composable
 fun Profile(
     user: User,
+    bills: List<Bill>,
     transactions: List<Transaction>,
     onUpdate: (ProfileUpdateReq) -> Unit
 ) {
@@ -151,7 +154,7 @@ fun Profile(
                         TextValueRow(
                             Modifier.padding(horizontal = 12.dp),
                             "Monthly Bills",
-                            "$0"
+                            "$${calculateMonthlyBillsTotal(bills)}"
                         )
                         Text(
                             "Payday in ${getTimeLeft(user.monthlyIncome.payday)}",

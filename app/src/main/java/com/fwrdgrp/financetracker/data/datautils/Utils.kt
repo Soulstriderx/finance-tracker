@@ -4,8 +4,10 @@ import com.fwrdgrp.financetracker.data.enum.Category
 import com.fwrdgrp.financetracker.data.enum.DateFilter
 import com.fwrdgrp.financetracker.data.enum.PaymentMethod
 import com.fwrdgrp.financetracker.data.enum.TransactionType
+import com.fwrdgrp.financetracker.data.model.main.Bill
 import com.fwrdgrp.financetracker.data.model.main.Budget
 import com.fwrdgrp.financetracker.data.model.main.DerivedDate
+import com.fwrdgrp.financetracker.data.model.main.Payment
 import com.fwrdgrp.financetracker.data.model.main.User
 import com.fwrdgrp.financetracker.data.model.request.TransactionReq
 import com.fwrdgrp.financetracker.ui.uiutils.toCalendar
@@ -13,7 +15,9 @@ import com.fwrdgrp.financetracker.ui.uiutils.toTimestamp
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 fun deriveDateFields(timestamp: Long): DerivedDate {
     val calendar = Calendar.getInstance()
@@ -273,6 +277,39 @@ fun createIncomeTransaction(user: User): TransactionReq {
         week = derivedDate.week,
         month = derivedDate.month,
         day = derivedDate.day
+    )
+}
+
+fun createBillTransaction(bill: Bill, uid: String): TransactionReq {
+    val calendar = Calendar.getInstance()
+    val derivedDate = deriveDateFields(calendar.timeInMillis)
+    return TransactionReq(
+        uid = uid,
+        type = TransactionType.Expense,
+        method = PaymentMethod.FPX,
+        category = Category.Other,
+        customCategory = "Bill",
+        amount = bill.amount,
+        note = bill.name,
+        timestamp = calendar.toTimestamp(),
+        year = derivedDate.year,
+        week = derivedDate.week,
+        month = derivedDate.month,
+        day = derivedDate.day
+    )
+}
+
+fun createPaymentRecord(uid: String, bill: Bill): Payment {
+    val currentDate = bill.nextDue ?: Timestamp.now()
+    val calendar = Calendar.getInstance().apply {
+        time = currentDate.toDate()
+    }
+    val monthYear = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(calendar.time)
+
+    return Payment(
+        uid = uid,
+        paidDate = currentDate,
+        monthYear = monthYear
     )
 }
 

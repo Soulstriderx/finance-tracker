@@ -6,10 +6,12 @@ import com.fwrdgrp.financetracker.data.enum.BudgetStatus
 import com.fwrdgrp.financetracker.data.enum.Category
 import com.fwrdgrp.financetracker.data.enum.DateFilter
 import com.fwrdgrp.financetracker.data.enum.TransactionType
+import com.fwrdgrp.financetracker.data.model.main.Bill
 import com.fwrdgrp.financetracker.data.model.main.Budget
 import com.fwrdgrp.financetracker.data.model.main.MonthlyIncome
 import com.fwrdgrp.financetracker.data.model.main.Transaction
 import com.fwrdgrp.financetracker.data.model.main.User
+import com.fwrdgrp.financetracker.data.model.request.BillReq
 import com.fwrdgrp.financetracker.data.model.request.BudgetReq
 import com.fwrdgrp.financetracker.data.model.request.ProfileUpdateReq
 import com.fwrdgrp.financetracker.data.model.request.TransactionReq
@@ -556,6 +558,44 @@ fun toRange(filter: DateFilter): Pair<Long, Long> {
     }
 
     return startCal.timeInMillis to endCal.timeInMillis
+}
+
+fun createBillReqWithBill(bill: Bill): BillReq {
+    return BillReq(
+        uid = bill.uid,
+        name = bill.name,
+        newName = bill.name,
+        amount = bill.amount,
+        newAmount = bill.amount,
+        nextDue = bill.nextDue,
+        newNextDue = bill.nextDue,
+        day = bill.day,
+        newDay = bill.day,
+    )
+}
+
+fun calculateNextBillDue(originalRefreshDay: Int, current: Timestamp): Timestamp {
+    val nextRefreshCalendar = current.toCalendar().apply {
+        set(Calendar.DAY_OF_MONTH, 1)
+
+        add(Calendar.MONTH, 1)
+
+        val maxDayInNextMonth = getActualMaximum(Calendar.DAY_OF_MONTH)
+        val targetDay = minOf(originalRefreshDay, maxDayInNextMonth)
+
+        set(Calendar.DAY_OF_MONTH, targetDay)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+
+    return nextRefreshCalendar.toTimestamp()
+}
+
+fun calculateMonthlyBillsTotal(bills: List<Bill>): String {
+    val total = bills.sumOf { it.amount.toDoubleOrNull() ?: 0.0 }
+    return total.toString()
 }
 
 

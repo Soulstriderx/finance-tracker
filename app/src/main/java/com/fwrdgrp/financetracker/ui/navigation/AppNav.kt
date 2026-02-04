@@ -27,6 +27,8 @@ import com.fwrdgrp.financetracker.ui.composables.scaffold.CustomTopBar
 import com.fwrdgrp.financetracker.ui.navigation.auth.AuthViewModel
 import com.fwrdgrp.financetracker.ui.screens.auth.login.LoginScreen
 import com.fwrdgrp.financetracker.ui.screens.auth.register.RegisterScreen
+import com.fwrdgrp.financetracker.ui.screens.bills.BillsScreen
+import com.fwrdgrp.financetracker.ui.screens.bills.details.BillDetailScreen
 import com.fwrdgrp.financetracker.ui.screens.breakdown.BreakdownScreen
 import com.fwrdgrp.financetracker.ui.screens.home.HomeScreen
 import com.fwrdgrp.financetracker.ui.screens.manage.add.AddTransactionScreen
@@ -52,6 +54,7 @@ fun AppNav(
         curDest.hasRoute<Screen.TranDetails>() ||
         curDest.hasRoute<Screen.Login>() ||
         curDest.hasRoute<Screen.Breakdown>() ||
+        curDest.hasRoute<Screen.BillDetails>() ||
         curDest.hasRoute<Screen.Register>() -> false
         else -> true
     }
@@ -76,6 +79,7 @@ fun AppNav(
         curDest.hasRoute<Screen.Home>() ||
         curDest.hasRoute<Screen.Transaction>() ||
         curDest.hasRoute<Screen.Profile>() ||
+        curDest.hasRoute<Screen.Bills>() ||
         curDest.hasRoute<Screen.Stats>() -> false
         else -> true
     }
@@ -90,6 +94,8 @@ fun AppNav(
         curDest.hasRoute<Screen.TranDetails>() -> "Transaction Details"
         curDest.hasRoute<Screen.Profile>() -> "Profile"
         curDest.hasRoute<Screen.Breakdown>() -> "Transaction Breakdown"
+        curDest.hasRoute<Screen.Bills>() -> "Bills"
+        curDest.hasRoute<Screen.BillDetails>() -> "Bill Details"
         else -> ""
     }
 
@@ -146,7 +152,9 @@ fun Nav(modifier: Modifier = Modifier, navController: NavHostController) {
         composable<Screen.Transaction> { TransactionScreen(navController) }
         composable<Screen.TranDetails> { TransactionDetailsScreen(navController) }
         composable<Screen.Stats> { StatsScreen(navController) }
-        composable<Screen.Profile> { ProfileScreen(navController) }
+        composable<Screen.Profile> { ProfileScreen() }
         composable<Screen.Breakdown> { BreakdownScreen() }
+        composable<Screen.Bills> { BillsScreen(navController) }
+        composable<Screen.BillDetails>{ BillDetailScreen() }
     }
 }

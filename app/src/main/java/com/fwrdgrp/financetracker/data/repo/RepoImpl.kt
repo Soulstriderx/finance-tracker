@@ -5,12 +5,16 @@ import com.fwrdgrp.financetracker.data.datautils.calculateBudgetUpdatesForEdit
 import com.fwrdgrp.financetracker.data.datautils.calculateDateRange
 import com.fwrdgrp.financetracker.data.datautils.calculateMetricChanges
 import com.fwrdgrp.financetracker.data.datautils.calculateStatsDateRange
+import com.fwrdgrp.financetracker.data.datautils.createBillTransaction
 import com.fwrdgrp.financetracker.data.datautils.createIncomeTransaction
+import com.fwrdgrp.financetracker.data.datautils.createPaymentRecord
 import com.fwrdgrp.financetracker.data.datautils.plus
 import com.fwrdgrp.financetracker.data.datautils.updateUserMetricsAndBudget
 import com.fwrdgrp.financetracker.data.enum.DateFilter
+import com.fwrdgrp.financetracker.data.model.main.Bill
 import com.fwrdgrp.financetracker.data.model.main.Transaction
 import com.fwrdgrp.financetracker.data.model.main.User
+import com.fwrdgrp.financetracker.data.model.request.BillReq
 import com.fwrdgrp.financetracker.data.model.request.LoginReq
 import com.fwrdgrp.financetracker.data.model.request.ProfileUpdateReq
 import com.fwrdgrp.financetracker.data.model.request.RegisterReq
@@ -86,9 +90,11 @@ class RepoImpl @Inject constructor(
             isAdding = true
         )
 
-        val transactionRef = userDoc()
-            .collection("transactions")
-            .document()
+        val transactionRef = if (transaction.uid.isEmpty()) {
+            userDoc().collection("transactions").document()
+        } else {
+            userDoc().collection("transactions").document(transaction.uid)
+        }
 
         val transactionWithId = transaction.copy(uid = transactionRef.id)
 
@@ -299,5 +305,75 @@ class RepoImpl @Inject constructor(
 
         addTransaction(createIncomeTransaction(user))
         userDoc().update(mapOf("monthlyIncome.payday" to newTimestamp))
+    }
+
+    override suspend fun fetchBills(): List<Bill> {
+        val snapshot = userDoc().collection("bills").get().await()
+        return snapshot.documents.mapNotNull {
+            it.toObject(Bill::class.java)
+        }
+    }
+
+    override suspend fun fetchBillById(uid: String): Bill {
+        val snapshot = userDoc().collection("bills")
+            .document(uid).get().await()
+
+        return snapshot.toObject(Bill::class.java)
+            ?: throw Exception("Bill doesn't exist")
+    }
+
+    override suspend fun addBill(bill: BillReq) {
+        val billRef = userDoc()
+            .collection("bills")
+            .document()
+
+        val billWithId = bill.copy(uid = billRef.id)
+
+        billRef.set(billWithId.toMap()).await()
+    }
+
+    override suspend fun payBill(bill: Bill, newTimestamp: Timestamp) {
+        val docUid = userDoc().collection("transactions").document()
+        val transaction = createBillTransaction(bill, docUid.id)
+        addTransaction(transaction)
+        val record = createPaymentRecord(docUid.id, bill)
+        userDoc().collection("bills").document(bill.uid)
+            .update(
+                mapOf(
+                    "paymentHistory" to FieldValue.arrayUnion(record.toMap()),
+                    "nextDue" to newTimestamp
+                )
+            )
+    }
+
+    override suspend fun deleteBill(uid: String) {
+        userDoc().collection("bills").document(uid).delete().await()
+    }
+
+    override suspend fun editBill(bill: BillReq) {
+        userDoc()
+            .collection("bills")
+            .document(bill.uid)
+            .update(bill.toEditMap()).await()
+    }
+
+    override suspend fun deletePaymentRecord(
+        bill: Bill,
+        paymentUid: String
+    ) {
+        val payment = bill.paymentHistory.find { it.uid == paymentUid }
+            ?: throw Exception("Payment record not found")
+
+        val transactionSnapshot = userDoc().collection("transactions")
+            .document(paymentUid).get().await()
+
+        val transaction = transactionSnapshot.toObject(Transaction::class.java)
+            ?: throw Exception("Transaction not found")
+
+        deleteTransaction(paymentUid, transaction)
+
+        val updatedHistory = bill.paymentHistory.filter { it.uid != paymentUid }
+        userDoc().collection("bills").document(bill.uid)
+            .update("paymentHistory", updatedHistory.map { it.toMap() }).await()
     }
 }
