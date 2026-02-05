@@ -1,25 +1,41 @@
 package com.fwrdgrp.financetracker.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+private val MainColorScheme = lightColorScheme(
+    primary = AlmostBlack,
+    onPrimary = OffWhite,
+    primaryContainer = LightTan,
+    onPrimaryContainer = DarkestBrown,
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    secondary = MediumBrown,
+    onSecondary = WarmCream,
+    secondaryContainer = LightBrown,
+    onSecondaryContainer = DarkestBrown,
+
+    tertiary = SageGreen,
+    onTertiary = DarkestBrown,
+    tertiaryContainer = LightTan,
+    onTertiaryContainer = DarkBrown,
+
+    error = Terracotta,
+    onError = WarmCream,
+    errorContainer = LightTan,
+    onErrorContainer = DarkBrown,
+
+    background = WarmCream,
+    onBackground = DarkBrown,
+
+    surface = WarmCream,
+    onSurface = DarkBrown,
+    surfaceVariant = LightTan,
+    onSurfaceVariant = MediumBrown,
+
+    outline = LightBrown,
+    outlineVariant = LightTan,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -39,18 +55,9 @@ fun FinanceTrackerTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = MainColorScheme,
         typography = Typography,
         content = content
     )
