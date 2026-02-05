@@ -50,7 +50,6 @@ fun RegisterScreen(
 ) {
 
     var form by remember { mutableStateOf(RegisterReq()) }
-    var income by remember { mutableStateOf(MonthlyIncome()) }
     var showDialog by remember { mutableStateOf(false) }
 
     var checked by remember { mutableStateOf(false) }
@@ -81,27 +80,24 @@ fun RegisterScreen(
     }
 
     Register(
-        { viewModel.register(form, income, checked) },
+        { viewModel.register(form, it, checked) },
         { navController.popBackStack() },
         checked,
         { checked = !checked },
-        income,
-        { income = it },
         form
     ) { form = it }
 }
 
 @Composable
 fun Register(
-    onRegister: () -> Unit,
+    onRegister: (MonthlyIncome) -> Unit,
     navToLogin: () -> Unit,
     checked: Boolean,
     onChecked: (Boolean) -> Unit,
-    income: MonthlyIncome,
-    onIncomeChange: (MonthlyIncome) -> Unit,
     form: RegisterReq,
     onFormChange: (RegisterReq) -> Unit,
 ) {
+    var income by remember { mutableStateOf(MonthlyIncome()) }
 
     val paydayCalendar = income.payday?.toCalendar()
 
@@ -156,14 +152,14 @@ fun Register(
                 if (checked) {
                     CustomTextField("Monthly Income", income.amount,
                         modifier = Modifier.background(color = OffWhite, shape = RoundedCornerShape(12.dp)))
-                    { onIncomeChange(income.copy(amount = it)) }
+                    { income = (income.copy(amount = it)) }
                     Spacer(Modifier.height(16.dp))
                     DatePicker(
                         selectedDate = paydayCalendar?.toRegisterString() ?: "",
                         existingCalendar = paydayCalendar,
                         onDateSelected = { calendar ->
                             val timestamp = Timestamp(calendar.time)
-                            onIncomeChange(
+                            income = (
                                 income.copy(
                                     day = calendar.get(Calendar.DAY_OF_MONTH),
                                     payday = timestamp
@@ -203,7 +199,7 @@ fun Register(
                 .padding(16.dp),
             shape = RoundedCornerShape(12.dp),
             onClick = {
-                onRegister()
+                onRegister(income)
             }
         ) {
             Text(
