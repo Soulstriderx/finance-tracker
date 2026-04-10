@@ -8,15 +8,31 @@ A modern Android finance management app built with Kotlin, Jetpack Compose, and 
 
 ---
 
+<div align="center">
+    
 ## 📌 Overview
+
+</div>
 
 Finance Tracker is a mobile application designed to help users manage personal finances by tracking income, expenses, budgets, and bills in real time.
 
 It provides a simple, structured, and cloud-synced overview of spending habits.
 
+This project has :
+
+- Modern Android development with Jetpack Compose  
+- Firebase integration (Firestore + Auth)  
+- Real-time data synchronization  
+- Clean architecture (MVVM-style)  
+- Reactive UI design  
+
 ---
 
+<div align="center">
+
 ## ✨ Key Features
+
+</div>
 
 - 💰 Add income and expense transactions  
 - 📊 Real-time balance calculation  
@@ -29,7 +45,11 @@ It provides a simple, structured, and cloud-synced overview of spending habits.
 
 ---
 
+<div align="center">
+
 ## 🏗️ Tech Stack
+
+</div>
 
 - Platform: Android (Android Studio)  
 - Language: Kotlin  
@@ -38,6 +58,8 @@ It provides a simple, structured, and cloud-synced overview of spending habits.
 - Auth: Firebase Authentication  
 
 ---
+
+<div align="center">
 
 ## ⚙️ Architecture
 
@@ -48,7 +70,11 @@ It provides a simple, structured, and cloud-synced overview of spending habits.
 
 ---
 
+<div align="center">
+
 ## ⚙️ Setup & Installation
+
+</div>
 
 1. Clone the repository:
 
@@ -69,7 +95,11 @@ It provides a simple, structured, and cloud-synced overview of spending habits.
 
 ---
 
+<div align="center">
+
 ## 📊 How It Works
+
+</div>
 
 - User registers and logs in via Firebase Auth  
 - Transactions stored in Firestore under user account  
@@ -79,23 +109,21 @@ It provides a simple, structured, and cloud-synced overview of spending habits.
 
 ---
 
-## 🎯 What This Project Demonstrates
-
-- Modern Android development with Jetpack Compose  
-- Firebase integration (Firestore + Auth)  
-- Real-time data synchronization  
-- Clean architecture (MVVM-style)  
-- Reactive UI design  
-
----
+<div align="center">
 
 ## 📷 Screenshots
+
+</div>
 
 Screenshots TBA (dashboard, transactions, budgets, bills)
 
 ---
 
+<div align="center">
+
 ## 🚀 Future Improvements
+
+</div>
 
 - Export data as PDF/CSV  
 - Dark mode support  
@@ -104,13 +132,21 @@ Screenshots TBA (dashboard, transactions, budgets, bills)
 
 ---
 
+<div align="center">
+
 ## 👤 Author
+
+</div>
 
 Alex Sim  
 GitHub: https://github.com/Soulstriderx
 
 ---
 
+<div align="center">
+
 ## 📄 License
+
+</div>
 
 This project is open-source under the MIT License.
