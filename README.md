@@ -63,6 +63,8 @@ This project has :
 
 ## ⚙️ Architecture
 
+</div>
+
 - UI Layer: Jetpack Compose screens  
 - ViewModel Layer: State + logic handling  
 - Repository Layer: Firebase operations  
